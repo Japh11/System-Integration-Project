@@ -1,0 +1,143 @@
+/* Import Quicksand Font */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+/* Header */
+.scholar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: white;
+    width: 100%;
+    height: 10vh;
+}
+
+.scholar-logo {
+    width: 150px;
+}
+
+.header-right h5 {
+    font-size: 20px;
+    color: #334F7D;
+    margin-right:40px;
+}
+
+/* Hero Section */
+.scholar-hero {
+    position: relative;
+    height: 90vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Login Section */
+.scholar-login-section {
+    background-color: white;
+    height: 70vh;
+    width: 55vh;
+    border-radius: 50px;
+    padding: 6vh;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    /*margin-right:-100vh*/
+}
+
+/* Logo */
+.login-logo {
+    width: 20vh;
+}
+
+/* Login Title */
+.login-title {
+    font-size: 35px;
+    font-weight: 600;
+    color: #334F7D;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.input-group {
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #5365AD;
+}
+
+/* Eye Icon for Password */
+.input-group .eye-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 20px;
+}
+
+/* Forgot Password */
+.forgot-password {
+    font-size: 18px;
+    color: #5365AD;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Sign In Button */
+.signin-button {
+    width: 100%;
+    background: linear-gradient(45deg, #5365AD, #334F7D);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.signin-button:hover {
+    background: linear-gradient(45deg, #334F7D, #5365AD);
+}
+
+/* Error Message */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Message Text */
+.message-text {
+    font-size: 14px;
+    color: #334F7D;
+}

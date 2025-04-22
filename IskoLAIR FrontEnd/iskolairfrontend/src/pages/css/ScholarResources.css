@@ -1,0 +1,105 @@
+.scholar-resources-page .scholar-dashboard-content {
+  padding: 20px;
+}
+
+.resources-scrollable {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+
+  /* 🔁 Relative border radius that adjusts with height/width */
+  border-radius: 2%;
+
+  /* Optional styling */
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+/* No default list style */
+.resources-scrollable ul {
+  list-style: none;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.resource-card {
+  padding: 20px;
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  border: none; /* 👈 removes any unwanted borders */
+}
+
+.resource-card:hover {
+  transform: translateY(-3px);
+}
+
+.resources-author {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334f7d;
+  margin-bottom: 4px;
+}
+
+.resource-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.resource-file-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 14px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.resource-icon {
+  font-size: 28px;
+  color: #334f7d;
+}
+
+.resource-filename {
+  flex-grow: 1;
+  font-size: 15px;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resource-download a {
+  text-decoration: none;
+  color: #334f7d;
+  transition: transform 0.2s ease;
+}
+
+.resource-download a:hover {
+  color: #1d3557;
+  transform: scale(1.1);
+}
+
+.resource-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+.scholar-first-half {
+  width: 160vh;
+  height: 25vh;
+  margin: 0 auto;
+  margin-left: 50px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-radius: 0;
+  border: none; /* <-- THIS causes the gray box */
+  padding: 20px;
+}

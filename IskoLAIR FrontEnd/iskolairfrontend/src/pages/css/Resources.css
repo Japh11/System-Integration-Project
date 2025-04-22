@@ -1,0 +1,218 @@
+/*--------------*/
+
+
+.Navigationbar {
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  width: 230px;
+  background-color: #88a4dc;
+  display: flex;
+  flex-direction: column;
+}
+
+.Navigationbar button {
+  display: block;
+  width: 100%;
+  padding: 15px 30px;
+  background-color: transparent;
+  color: white;
+  font-size: 20px;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    font-weight 0.3s ease;
+}
+
+.Navigationbar button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.Navigationbar button.active {
+  background-color: #7084c4;
+  font-weight: bold;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.Navigationbar button.active {
+  border-left: 5px solid white;
+  padding-left: 25px; /* adjust padding to compensate */
+}
+  
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .resources-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .form-container {
+    background: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-actions {
+    text-align: right;
+  }
+  
+  .form-actions button {
+    padding: 8px 12px;
+    border: none;
+    background: #334f7d;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  .form-actions button[type="button"] {
+    background: #aaa;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .resources-scrollable {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .resources-page-box {
+    background: white;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .resources-header {
+    display: flex;
+    align-items: center;
+  }
+  
+  .resources-profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .resources-header-text {
+    margin-left: 10px;
+  }
+  
+  .resources-author {
+    margin: 0;
+    color: #334f7d;
+  }
+  
+  .resources-more {
+    margin-left: auto;
+    position: relative;
+  }
+  
+  .more-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .dropdown-item {
+    display: block;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .delete-item {
+    color: red;
+  }
+  
+  .resources-text {
+    margin-top: 10px;
+  }
+  
+  .resource-title {
+    margin: 0;
+  }
+  
+  .resources-file {
+    margin-top: 10px;
+  }
+  
+  .resource-image {
+    max-width: 100%;
+    border-radius: 4px;
+  }
+  .resource-file-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-top: 10px;
+  }
+  
+  .resource-icon {
+    font-size: 28px;
+    color: #334f7d;
+  }
+  
+  .resource-filename {
+    flex-grow: 1;
+    font-size: 16px;
+    color: #333;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  .resource-download a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  
+  
+  

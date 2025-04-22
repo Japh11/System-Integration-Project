@@ -1,0 +1,151 @@
+
+  
+  .logo {
+  }
+  
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .resources-container {
+    display: flex;
+  }
+  
+  
+  .resources-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .form-container {
+    background: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-actions {
+    text-align: right;
+  }
+  
+  .form-actions button {
+    padding: 8px 12px;
+    border: none;
+    background: #334f7d;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  .form-actions button[type="button"] {
+    background: #aaa;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .resources-scrollable {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .resources-page-box {
+    background: white;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .resources-header {
+    display: flex;
+    align-items: center;
+  }
+  
+  .resources-profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .resources-header-text {
+    margin-left: 10px;
+  }
+  
+  .resources-author {
+    margin: 0;
+    color: #334f7d;
+  }
+  
+  .resources-more {
+    margin-left: auto;
+    position: relative;
+  }
+  
+  .more-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .dropdown-item {
+    display: block;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .delete-item {
+    color: red;
+  }
+  
+  .resources-text {
+    margin-top: 10px;
+  }
+  
+  .resource-title {
+    margin: 0;
+  }
+  
+  .resources-file {
+    margin-top: 10px;
+  }
+  
+  .resource-image {
+    max-width: 100%;
+    border-radius: 4px;
+  }

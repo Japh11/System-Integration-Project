@@ -1,0 +1,364 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.admin-dashboard-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.admin-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    height: 60px;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.admin-dashboard-content {
+    flex: 1;
+    padding: 2rem;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: -30px;
+}
+
+.logout-button {
+    background: linear-gradient(45deg, #FF4F4F, #992F2F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding: 5px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(200, 200, 200, 0.2);
+    border-radius: 25px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.logout-button:hover::before {
+    opacity: 1;
+}
+
+.admin-dashboard-page h1 {
+    margin-left: -900px;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    color: #334F7D;
+}
+
+.admin-dashboard-page .dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.admin-dashboard-page .dashboard-table th,
+.admin-dashboard-page .dashboard-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-dashboard-page .dashboard-table th {
+    background-color: #5365AD;
+    font-weight: bold;
+    color: white;
+}
+
+.admin-dashboard-page .dashboard-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.admin-dashboard-page .table-section {
+    margin-bottom: 3rem;
+    color: #334F7D;
+}
+
+.admin-dashboard-page .table-section h2 {
+    color: #5365AD;
+}
+
+.admin-dashboard-page .table-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.create-button {
+    background: linear-gradient(90deg, #5365AD, #334F7D);
+    color: white;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+    width: 140px;
+}
+
+.create-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(90deg, #334F7D, #1a2d5c);
+}
+
+.admin-dashboard-page .create-form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 8px;
+    gap: 1rem;
+}
+
+.create-form input {
+    padding: 0.75rem 1rem;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.2s;
+}
+
+.create-form input:focus {
+    outline: none;
+    border-color: #334F7D;
+}
+
+.create-form button {
+    background-color: #334F7D;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.create-form button:hover {
+    background-color: #1e3259;
+}
+
+.form-actions {
+    margin-top: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    color: #334F7D;
+    font-weight: 800;
+}
+
+.form-group input {
+    padding: 0.75rem 1rem;
+    font-size: 15px;
+    background-color: #eaeaea;
+    border: none;
+    border-radius: 10px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2), 
+                inset 0 -1px 3px rgba(255, 255, 255, 0.6);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    background-color: #e0e0e0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), 
+                inset 0 -1px 2px rgba(255, 255, 255, 0.6),
+                0 0 0 2px #334F7D33;
+}
+
+.admin-dashboard-page .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(5px); 
+    background-color: rgba(0, 0, 0, 0.3); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: backdrop-filter 0.3s ease-in-out;
+}
+
+.admin-dashboard-page .modal-content {
+    border-radius: 25px;
+    width: 90%;
+    max-width: 800px !important;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.admin-dashboard-page .modal-content h2 {
+    font-size: 35px;
+    color: #334F7D;
+    text-align: center;
+}
+
+.admin-dashboard-page .submit-button {
+    background: linear-gradient(90deg, #5365AD, #334F7D);
+    width: 200px;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.admin-dashboard-page .submit-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(90deg, #334F7D, #1a2d5c);
+}
+
+.close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.archive-button {
+    background-color: #f0ad4e;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+.reactivate-button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.admin-dashboard-page .create-button {
+    background: linear-gradient(90deg, #5365AD, #334F7D);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+}
+
+.admin-dashboard-page .create-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(90deg, #334F7D, #1a2d5c);
+}
+
+/* Step title style */
+.step-title {
+    text-align: center;
+    font-size: 22px;
+    color: #334F7D;
+    margin-bottom: 15px;
+}
+
+/* Navigation buttons for steps */
+.step-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+/* Step indicator bar */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    gap: 10px;
+}
+.step-indicator .circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ccc;
+    color: #fff;
+}
+.step-indicator .circle.active {
+    background-color: #334F7D;
+}
+.step-indicator .line {
+    height: 2px;
+    width: 40px;
+    background-color: #ccc;
+}
+.step-indicator .line.active {
+    background-color: #334F7D;
+}
+
+/* Two-column field layout */
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+.form-row .form-group {
+    flex: 1;
+}
+.form-row .form-group.short {
+    flex: 0.5;
+}

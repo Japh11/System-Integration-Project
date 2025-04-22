@@ -1,0 +1,126 @@
+.assignment-page {
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #f7f7f7;
+  }
+  
+  .assignment-wrapper {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 0;
+  }
+  
+  .assignment-container {
+    max-width: 1200px;
+    width: 80%;
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    color: #334F7D;
+    font-weight: 800;
+  }
+  
+  .assignment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .assignment-header h1 {
+    font-size: 35px;
+    margin: 0;
+    color: #334F7D;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-buttons button {
+    background-color: #e0e4f1;
+    color: #334F7D;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .filter-buttons button.active {
+    background: #334F7D;
+    color: white;
+  }
+  
+  .submission-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .submission-item {
+    background-color: #fff;
+    border-left: 6px solid #A7B5D1;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  .submission-item p {
+    margin: 5px 0;
+    color: #334F7D;
+    font-weight: 500;
+  }
+  
+  .submission-item ul {
+    margin: 10px 0 0;
+    padding-left: 20px;
+  }
+  
+  .submission-item a {
+    color: #334F7D;
+    font-weight: 500;
+    text-decoration: underline;
+  }
+  
+  .btn-danger {
+    background: linear-gradient(90deg, #ff4f4f, #992f2f);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: fit-content;
+    margin-top: 10px;
+  }
+  
+  .btn-danger:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #e73b3b, #7c1e1e);
+  }
+  
+  .error-message {
+    color: #e74c3c;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  .success-message {
+    color: #2ecc71;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
