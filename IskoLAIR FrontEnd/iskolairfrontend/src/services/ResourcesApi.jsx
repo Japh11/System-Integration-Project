@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/fileresources"; // Adjust based on your backend mapping
+const API_URL = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/fileresources"; // Default to localhost if not set
+
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");

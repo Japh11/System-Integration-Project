@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/auth";
+// Correct usage of environment variable with the correct prefix
+const API_URL = process.env.REACT_APP_ISKOLAIR_API_URL || "http://localhost:8080/api/auth";
 
 const handleApiCall = async (endpoint, data) => {
     try {

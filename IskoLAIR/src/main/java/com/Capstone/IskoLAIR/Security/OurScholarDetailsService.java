@@ -21,17 +21,11 @@ public class OurScholarDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        OurScholars scholar = scholarRepo.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Scholar not found"));
-
-        if (scholar.isArchived()) {
-            throw new UsernameNotFoundException("This scholar account has been archived.");
-        }
-
-        return new org.springframework.security.core.userdetails.User(
-                scholar.getEmail(),
-                scholar.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + scholar.getRole()))
-        );
+        return scholarRepo.findByEmail(email)
+                .map(scholar -> new org.springframework.security.core.userdetails.User(
+                        scholar.getEmail(),
+                        scholar.getPassword(),
+                        List.of(new SimpleGrantedAuthority("ROLE_" + scholar.getRole()))))  // ✅ Dynamically set role
+                .orElseThrow(() -> new UsernameNotFoundException("Could not find Scholar with email = " + email));
     }
 }

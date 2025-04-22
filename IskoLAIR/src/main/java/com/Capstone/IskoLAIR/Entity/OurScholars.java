@@ -42,10 +42,6 @@ public class OurScholars  {
     private String province;
     private String district;
     private String region;
-    @Column(nullable = false)
-    private boolean archived = false;
-    @Column(nullable = true)
-    private String profilePicture;
 
     @ManyToOne
     @JoinColumn(name = "created_by_admin_id")
@@ -287,23 +283,10 @@ public class OurScholars  {
     public void setAnnouncements(List<Announcement> announcements) {
         this.announcements = announcements;
     }
-    @PreRemove
-    private void detatchAnnouncements() {
-        for (Announcement ann : new ArrayList<>(announcements)) {
-        ann.getScholars().remove(this);
-        }
+@PreRemove
+  private void detatchAnnouncements() {
+    for (Announcement ann : new ArrayList<>(announcements)) {
+      ann.getScholars().remove(this);
     }
-    public boolean isArchived() {
-        return archived;
-    }
-
-    public void setArchived(boolean archived) {
-        this.archived = archived;
-    }
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
+  }
 }

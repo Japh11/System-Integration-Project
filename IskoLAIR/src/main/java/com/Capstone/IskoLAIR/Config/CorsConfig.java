@@ -15,14 +15,14 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Allow all endpoints
                         .allowedOrigins("http://localhost:5173") // Allow frontend requests from React
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow methods
                         .allowedHeaders("*") // Allow all headers
                         .allowCredentials(true); // Allow cookies and authentication headers
 
                 // Explicitly allow the staff route
                 registry.addMapping("/api/staff/register-scholar")
                         .allowedOrigins("http://localhost:5173")
-                        .allowedMethods("POST", "PATCH")
+                        .allowedMethods("POST")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }

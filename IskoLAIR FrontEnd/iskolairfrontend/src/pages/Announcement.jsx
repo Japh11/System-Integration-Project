@@ -6,9 +6,6 @@ import AnnouncementFormModal from './AnnouncementForm';
 import "../pages/css/Announcement.css";
 import profileImg from '../assets/temp-profile.jpg';
 
-import StaffHeader from '../components/StaffHeader';
-import StaffNavbar from '../components/StaffNavbar';
-
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -19,18 +16,17 @@ const Announcement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null); // Store the id of the announcement to edit
   const navigate = useNavigate();
-  const [lightboxImage, setLightboxImage] = useState(null);
 
-  const fetchAnnouncements = async () => {
-    try {
-      const data = await AnnouncementApi.getAllAnnouncements();
-      setAnnouncements(data);
-    } catch (err) {
-      setError("Failed to load announcements");
-    }
-  };
-  
   useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const data = await AnnouncementApi.getAllAnnouncements();
+        setAnnouncements(data);
+      } catch (err) {
+        setError("Failed to load announcements");
+      }
+    };
+
     fetchAnnouncements();
   }, []);
 
@@ -47,9 +43,55 @@ const Announcement = () => {
 
   return (
     <div className="announcement-page">
-      <StaffHeader />
-        <div className="staff-dashboard">
-          <StaffNavbar />
+      <div className="staff-header">
+        <img src={logo} alt="IskoLAIR Logo" className="logo" />
+        <img
+          src="https://via.placeholder.com/40"
+          alt="Profile"
+          style={{ width: "40px", height: "40px", cursor: "pointer" }}
+          onClick={() => navigate("/staff/profile")}
+        />
+      </div>
+
+      <div className="announcement-container">
+      <div className="Navigationbar">
+        <button
+          className={location.pathname === "/staff/dashboard" ? "active" : ""}
+          onClick={() => navigate("/staff/dashboard")}
+          >
+            Home
+          </button>
+          <button
+            className={location.pathname === "/announcements" ? "active" : ""}
+            onClick={() => navigate("/announcements")}
+            >
+              Announcements
+          </button>
+          <button
+            className={location.pathname === "/assignments" ? "active" : ""}
+            onClick={() => navigate("/assignments")}
+            >
+              Assigments
+          </button>
+          <button
+            className={location.pathname === "/messages" ? "active" : ""}
+            onClick={() => navigate("/messages")}
+            >
+              Messages
+          </button>
+          <button
+            className={location.pathname === "/resources" ? "active" : ""}
+            onClick={() => navigate("/resources")}
+          >
+            Resources
+          </button>
+          {/*<button
+            className={location.pathname === "/faq" ? "active" : ""}
+            onClick={() => navigate("/faq")}
+            >
+              FAQ
+          </button> */}
+      </div>
 
         <div className="announcement-content">
           <div className="CreateAnnouncement-A" onClick={() => { setEditId(null); setShowModal(true); }}>
@@ -116,30 +158,24 @@ const Announcement = () => {
               
                 {announcement.photos && announcement.photos.length > 0 && (
                   <div className="announcement-photos">
-                  {announcement.photos.map((url, index) => (
-                    <img
-                      key={index}
-                      src={url.startsWith("data:") || url.startsWith("http") ? url : `data:image/jpeg;base64,${url}`}
-                      alt={`Photo ${index + 1}`}
-                      className="announcement-image"
-                      onClick={() => setLightboxImage(url.startsWith("data:") || url.startsWith("http") ? url : `data:image/jpeg;base64,${url}`)}
-                    />
-                  ))}
-                  {lightboxImage && (
-                    <div className="lightbox-overlay" onClick={() => setLightboxImage(null)}>
-                      <img src={lightboxImage} alt="Enlarged" className="lightbox-image" />
-                    </div>
-                  )}
-                </div>
+                    {announcement.photos.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url.startsWith("data:") || url.startsWith("http") ? url : `data:image/jpeg;base64,${url}`}
+                        alt={`Photo ${index + 1}`}
+                        className="announcement-image"
+                      />
+                    ))}
+                  </div>
                 )}
               
                 <hr className="announcement-divider" />
               
-                {/*<div className="announcement-actions">
+                <div className="announcement-actions">
                   <ThumbUpIcon className="icon" sx={{ color: '#334f7d' }} />
                   <ChatBubbleOutlineIcon className="icon" sx={{ color: '#334f7d' }} />
 
-                </div>*/}
+                </div>
               </li>
               
               ))}
@@ -149,15 +185,11 @@ const Announcement = () => {
       </div>
 
       {showModal && (
-      <AnnouncementFormModal
-        onClose={() => setShowModal(false)}
-        onSuccess={() => {
-          setShowModal(false);
-          fetchAnnouncements(); // 🔄 refresh announcements
-        }}
-        id={editId}
-      />
-    )}
+        <AnnouncementFormModal
+          onClose={() => setShowModal(false)}
+          id={editId}
+        />
+      )}
     </div>
   );
 };

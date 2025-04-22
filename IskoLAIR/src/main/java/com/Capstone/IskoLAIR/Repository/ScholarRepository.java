@@ -11,7 +11,4 @@ import com.Capstone.IskoLAIR.Entity.OurScholars;
 public interface ScholarRepository extends JpaRepository<OurScholars, Long> {
 	 public Optional<OurScholars> findByEmail(String email);
 	 List<OurScholars> findByCreatedBy(Admin admin);
-	 List<OurScholars> findByArchivedFalse();
-	 List<OurScholars> findByArchivedTrue();
-
 }

@@ -20,18 +20,11 @@ public class StaffDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Staff staff = staffRepo.findByEmail(email)
+        return staffRepo.findByEmail(email)
+                .map(staff -> new org.springframework.security.core.userdetails.User(
+                        staff.getEmail(),
+                        staff.getPassword(),
+                        List.of(new SimpleGrantedAuthority("ROLE_STAFF"))))  // ✅ Assign "STAFF" role
                 .orElseThrow(() -> new UsernameNotFoundException("Could not find Staff with email = " + email));
-
-        // 🚫 Check if the staff account is archived
-        if (staff.isArchived()) {
-            throw new UsernameNotFoundException("This staff account has been archived.");
-        }
-
-        return new org.springframework.security.core.userdetails.User(
-                staff.getEmail(),
-                staff.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_STAFF"))
-        );
     }
 }

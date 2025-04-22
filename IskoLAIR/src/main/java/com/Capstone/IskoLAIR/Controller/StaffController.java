@@ -6,16 +6,12 @@ import com.Capstone.IskoLAIR.Entity.Staff;
 import com.Capstone.IskoLAIR.Repository.ScholarRepository;
 import com.Capstone.IskoLAIR.Repository.StaffRepository;
 import com.Capstone.IskoLAIR.Security.JWTUtil;
-import com.Capstone.IskoLAIR.Service.FileStorageService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +26,6 @@ public class StaffController {
     @Autowired private StaffRepository staffRepo;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JWTUtil jwtUtil;
-    @Autowired private FileStorageService fileStorageService; // Assuming you have a service for file storage
 
     // ✅ Staff registers a scholar
     @PostMapping("/register-scholar")
@@ -71,96 +66,30 @@ public class StaffController {
  
          return ResponseEntity.ok(staff);
      }
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> archiveStaff(@PathVariable Long id) {
-        Optional<Staff> optionalStaff = staffRepo.findById(id);
-        if (optionalStaff.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Staff not found"));
-        }
-
-        Staff staff = optionalStaff.get();
-        staff.setArchived(true);
-        staffRepo.save(staff);
-
-        return ResponseEntity.ok(Map.of("message", "Staff archived successfully"));
-    }
+     @DeleteMapping("/{id}")
+     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can delete staff
+     public ResponseEntity<?> deleteStaff(@PathVariable Long id) {
+         if (!staffRepo.existsById(id)) {
+             return ResponseEntity.badRequest().body(Map.of("error", "Staff not found"));
+         }
+ 
+         staffRepo.deleteById(id);
+         return ResponseEntity.ok(Map.of("message", "Staff deleted successfully"));
+     }
      
-    @GetMapping("/visible")
-    @PreAuthorize("hasAnyRole('SCHOLAR', 'STAFF', 'ADMIN')")
-    public List<Map<String, Object>> getVisibleStaff() {
-        return staffRepo.findByArchivedFalse().stream()
-            .map(staff -> {
-                Map<String, Object> m = new HashMap<>();
-                m.put("id", staff.getId());
-                m.put("firstName", staff.getFirstName());
-                m.put("lastName", staff.getLastName());
-                m.put("email", staff.getEmail());
-                return m;
-            })
-            .collect(Collectors.toList());
-    }
-    @PutMapping("/reactivate/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> reactivateStaff(@PathVariable Long id) {
-        Optional<Staff> optionalStaff = staffRepo.findById(id);
-        if (optionalStaff.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Staff not found"));
-        }
+     @GetMapping("/visible")
+     @PreAuthorize("hasAnyRole('SCHOLAR', 'STAFF', 'ADMIN')")
+     public List<Map<String, Object>> getVisibleStaff() {
+         return staffRepo.findAll().stream()
+        		 .map(staff -> {
+        			    Map<String, Object> m = new HashMap<>();
+        			    m.put("id", staff.getId());
+        			    m.put("firstName", staff.getFirstName());
+        			    m.put("lastName", staff.getLastName());
+        			    m.put("email", staff.getEmail());
+        			    return m;
+        			})
+                 .collect(Collectors.toList());
+     }
 
-        Staff staff = optionalStaff.get();
-        if (!staff.isArchived()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Staff is already active"));
-        }
-
-        staff.setArchived(false);
-        staffRepo.save(staff);
-
-        return ResponseEntity.ok(Map.of("message", "Staff reactivated successfully"));
-    }
-    @GetMapping("/archived")
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<Map<String, Object>> getArchivedStaff() {
-        return staffRepo.findByArchivedTrue().stream()
-            .map(staff -> {
-                Map<String, Object> m = new HashMap<>();
-                m.put("id", staff.getId());
-                m.put("firstName", staff.getFirstName());
-                m.put("lastName", staff.getLastName());
-                m.put("email", staff.getEmail());
-                return m;
-            })
-            .collect(Collectors.toList());
-    }
-    @PostMapping("/{id}/upload-profile-picture")
-    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
-    public ResponseEntity<?> uploadProfilePicture(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        Optional<Staff> optionalStaff = staffRepo.findById(id);
-        if (optionalStaff.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Staff not found"));
-        }
-
-        Staff staff = optionalStaff.get();
-        try {
-            // Save the file using FileStorageService
-            String fileUrl = fileStorageService.save(file);
-            staff.setProfilePicture(fileUrl);
-            staffRepo.save(staff);
-
-            return ResponseEntity.ok(Map.of("message", "Profile picture uploaded successfully", "url", fileUrl));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Failed to upload profile picture"));
-        }
-    }
-    @GetMapping("/{id}/profile-picture")
-    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN') or hasRole('SCHOLAR')")
-    public ResponseEntity<?> getProfilePicture(@PathVariable Long id) {
-        Optional<Staff> optionalStaff = staffRepo.findById(id);
-        if (optionalStaff.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Staff not found"));
-        }
-
-        Staff staff = optionalStaff.get();
-        return ResponseEntity.ok(Map.of("profilePicture", staff.getProfilePicture()));
-    }
 }

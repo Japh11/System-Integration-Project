@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ScholarApi from "../services/ScholarApi";
-import profilePlaceholder from "../assets/profiletemp.jpg";
-import "./css/Profile.css"; 
 
 const ScholarProfile = () => {
     const navigate = useNavigate();
@@ -18,7 +16,7 @@ const ScholarProfile = () => {
         school: "",
         course: "",
         status: "",
-        typeOfScholarship: "",
+        typeOfScholarship:"",
         birthday: "",
         contactNumber: "",
         email: "",
@@ -28,31 +26,29 @@ const ScholarProfile = () => {
         district: "",
         region: "",
         password: "",
-        profilePicture: profilePlaceholder, // Default to placeholder
-    });
-    const [selectedFile, setSelectedFile] = useState(null);
+    }); // Default values for all fields
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
     useEffect(() => {
         const fetchScholarDetails = async () => {
-            try {
-                const scholarId = localStorage.getItem("scholarId");
-                if (!scholarId) throw new Error("No scholar ID found");
+            const token = localStorage.getItem("token");
+            if (!token) {
+                setError("Unauthorized: No token found. Please log in.");
+                return;
+            }
 
-                const scholarData = await ScholarApi.getScholarDetails();
-                setScholar({
-                    ...scholarData,
-                    profilePicture: scholarData.profilePicture || profilePlaceholder,
-                });
+            try {
+                const scholarData = await ScholarApi.getScholarDetails(); // Fetch the logged-in scholar's details
+                setScholar(scholarData);
             } catch (error) {
                 console.error("Error fetching scholar details:", error.message);
                 setError("Failed to fetch scholar details. Please log in again.");
             }
         };
-
+    
         fetchScholarDetails();
-    }, []);
+    }, [navigate]);
 
     const handleEditChange = (e) => {
         const { name, value } = e.target;
@@ -65,7 +61,7 @@ const ScholarProfile = () => {
         setError("");
 
         try {
-            await ScholarApi.updateScholar(scholar.id, scholar);
+            await ScholarApi.updateScholar(scholar.id, scholar); // Update the scholar's details
             setMessage("Profile updated successfully!");
         } catch (error) {
             console.error("Error updating scholar profile:", error.message);
@@ -73,267 +69,194 @@ const ScholarProfile = () => {
         }
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setSelectedFile(file);
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            setScholar({ ...scholar, profilePicture: reader.result });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleUploadProfilePicture = async () => {
-        if (!selectedFile) {
-            alert("Please select a file to upload.");
-            return;
-        }
-
-        try {
-            const response = await ScholarApi.uploadProfilePicture(scholar.id, selectedFile);
-            alert("✅ Profile picture uploaded successfully!");
-            setScholar({ ...scholar, profilePicture: response.url });
-        } catch (error) {
-            alert(`❌ Error uploading profile picture: ${error.message}`);
-        }
-    };
-
     const handleCancel = () => {
-        navigate("/scholar/dashboard");
+        navigate("/scholar/dashboard"); // Navigate to scholar dashboard
     };
 
     const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
         localStorage.clear();
-        navigate("/scholar/login");
+        navigate("/scholar/dashboard"); // Redirect to the login page
     };
 
+    if (!scholar) {
+        return <p>Loading profile...</p>;
+    }
+
     return (
-        <div className="scholar-profile-container">
-            <h2 className="profile-title">Scholar Profile</h2>
+        <div style={{ padding: "20px" }}>
+            <h2>Scholar Profile Settings</h2>
             {message && <p style={{ color: "green" }}>{message}</p>}
             {error && <p style={{ color: "red" }}>{error}</p>}
-
-            {/* Profile Picture Section */}
-            <div className="profile-image-section">
-                <div className="profile-image-wrapper">
-                    <img
-                        src={scholar.profilePicture}
-                        alt="Profile"
-                        className="profile-image"
-                    />
-                </div>
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-                <button onClick={handleUploadProfilePicture} className="upload-button">
-                    Upload Picture
-                </button>
-            </div>
-
-            <form onSubmit={handleUpdateScholar} className="profile-form">
-            <div className="scholar-input-group">
-                <label htmlFor="lastName" className="input-label">Last Name</label>
+            <form onSubmit={handleUpdateScholar}>
                 <input
                     type="text"
-                    id="lastName"
                     name="lastName"
                     value={scholar.lastName || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Last Name"
+                    placeholder="Last Name"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="scholar-input-group">
-                <label htmlFor="firstName" className="input-label">First Name</label>
                 <input
                     type="text"
-                    id="firstName"
                     name="firstName"
                     value={scholar.firstName || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter First Name"
+                    placeholder="First Name"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="scholar-input-group">
-                <label htmlFor="middleName" className="input-label">Middle Name</label>
                 <input
                     type="text"
-                    id="middleName"
                     name="middleName"
                     value={scholar.middleName || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Middle Name"
-                    className="input-field"
+                    placeholder="Middle Name"
                 />
-            </div>
-            <div className="scholar-input-group">
-                <label htmlFor="batchYear" className="input-label">Batch Year</label>
                 <input
                     type="number"
-                    id="batchYear"
                     name="batchYear"
                     value={scholar.batchYear || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Batch Year"
+                    placeholder="Batch Year"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="scholar-input-group">
-                <label htmlFor="accountNo" className="input-label">Account No</label>
                 <input
                     type="text"
-                    id="accountNo"
                     name="accountNo"
                     value={scholar.accountNo || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Account No"
+                    placeholder="Account No"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="spasNo" className="input-label">SPAS No</label>
                 <input
                     type="text"
-                    id="spasNo"
                     name="spasNo"
                     value={scholar.spasNo || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter SPAS No"
+                    placeholder="SPAS No"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="sex" className="input-label">Sex</label>
                 <input
                     type="text"
-                    id="sex"
                     name="sex"
                     value={scholar.sex || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Sex"
+                    placeholder="Sex"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="levelYear" className="input-label">Level/Year</label>
                 <input
                     type="text"
-                    id="levelYear"
                     name="levelYear"
                     value={scholar.levelYear || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Level/Year"
+                    placeholder="Level/Year"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="school" className="input-label">School</label>
                 <input
                     type="text"
-                    id="school"
                     name="school"
                     value={scholar.school || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter School"
+                    placeholder="School"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="course" className="input-label">Course</label>
                 <input
                     type="text"
-                    id="course"
                     name="course"
                     value={scholar.course || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Course"
+                    placeholder="Course"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="status" className="input-label">Status</label>
                 <input
                     type="text"
-                    id="status"
                     name="status"
                     value={scholar.status || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Status"
+                    placeholder="Status"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="typeOfScholarship" className="input-label">Type Of Scholarship</label>
                 <input
                     type="text"
-                    id="typeOfScholarship"
                     name="typeOfScholarship"
                     value={scholar.typeOfScholarship || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Type Of Scholarship"
+                    placeholder="Type Of Scholarship"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="birthday" className="input-label">Birthday</label>
                 <input
                     type="date"
-                    id="birthday"
                     name="birthday"
                     value={scholar.birthday || ""}
                     onChange={handleEditChange}
+                    placeholder="Birthday"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="contactNumber" className="input-label">Contact Number</label>
                 <input
                     type="text"
-                    id="contactNumber"
                     name="contactNumber"
                     value={scholar.contactNumber || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Contact Number"
+                    placeholder="Contact Number"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="input-group">
-                <label htmlFor="email" className="input-label">Email</label>
                 <input
                     type="email"
-                    id="email"
                     name="email"
                     value={scholar.email || ""}
                     onChange={handleEditChange}
-                    placeholder="Enter Email"
+                    placeholder="Email"
                     required
-                    className="input-field"
                 />
-            </div>
-            <div className="form-buttons">
-                <button type="submit" className="primary-button">Update Profile</button>
-                <button type="button" onClick={handleCancel} className="secondary-button">
+                <input
+                    type="text"
+                    name="brgy"
+                    value={scholar.brgy || ""}
+                    onChange={handleEditChange}
+                    placeholder="Barangay"
+                    required
+                />
+                <input
+                    type="text"
+                    name="municipality"
+                    value={scholar.municipality || ""}
+                    onChange={handleEditChange}
+                    placeholder="Municipality"
+                    required
+                />
+                <input
+                    type="text"
+                    name="province"
+                    value={scholar.province || ""}
+                    onChange={handleEditChange}
+                    placeholder="Province"
+                    required
+                />
+                <input
+                    type="text"
+                    name="district"
+                    value={scholar.district || ""}
+                    onChange={handleEditChange}
+                    placeholder="District"
+                    required
+                />
+                <input
+                    type="text"
+                    name="region"
+                    value={scholar.region || ""}
+                    onChange={handleEditChange}
+                    placeholder="Region"
+                    required
+                />
+                <button type="submit">Update Profile</button>
+                <button type="button" onClick={handleCancel} style={{ marginLeft: "10px" }}>
                     Cancel
                 </button>
-            </div>
-        </form>
-
-            <div className="logout-section">
-                <button onClick={handleLogout} className="logout-button">Logout</button>
-            </div>
+            </form>
+            <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+                Logout
+            </button>
         </div>
     );
 };

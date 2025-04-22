@@ -1,327 +1,81 @@
-/* General Page Reset */
 body, html {
-    height: 100%;
+    height: 100%;  /* Ensure the body and html take full height */
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  /* Scholar List Title */
-  .scholar-list-container h2 {
+}
+
+.scholar-list-container h2 {
     font-size: 30px;
     color: #334F7D;
-    border-bottom: 2px solid #D0D5E2;
-    padding-bottom: 10px;
-  }
-  
-  .scholar-list-container {
+    border-bottom: 2px solid #D0D5E2;  /* Adjust thickness and color of the line */
+    padding-bottom: 10px;  /* Optional: Adds some space between the text and the line */
+}
+
+.scholar-list-container {
     width: 95%;
     min-height: 90px;
-    border: solid 3px #D0D5E2;
+    border:solid 3px #D0D5E2;
     padding: 20px;
     border-radius: 10px;
     overflow-y: auto;
+    margin: 0 auto;  /* Centers horizontally */
+}
+
+.divider{
+    margin:10px;
+}
+
+.Types-Scholars{
+    width:95%;
+    height: 20vh;
     margin: 0 auto;
-  }
-  
-  .divider {
-    margin: 10px;
-  }
-  
-  /* =========================
-     FILTER CARDS (Type of Scholarship)
-     ========================= */
-  .Types-Scholars {
+    margin-top:8vh;
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin: 30px auto 10px auto;
-    flex-wrap: wrap;
-  }
-  
-  .filter-card {
-    width: 150px;
-    height: 100px;
+    justify-content: center; /* Aligns child elements horizontally in the center */
+    align-items: center;
+}
+.All, .RA7687-Scholars, .Merit-Scholars, .JLSS-Scholars {
+    width: 30%;
+    height: 20vh;
     background: #334F7D;
-    border-radius: 10px;
-    padding: 10px;
+    margin: 5px;
+    border-radius: 15px;
+    padding: 30px;
     color: white;
+    margin-top: -8vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between; /* Ensure space between header and count */
     align-items: center;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .filter-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .filter-card h3 {
-    font-size: 1.1rem;
-    margin: 0;
-  }
-  
-  .filter-card p {
+}
+
+.All h3, .RA7687-Scholars h3, .Merit-Scholars h3, .JLSS-Scholars h3 {
     font-size: 1.8rem;
-    margin: 5px 0 0 0;
-    font-weight: bold;
-  }
-  
-  /* =========================
-     BACK TO DASHBOARD BUTTON
-     ========================= */
-  .dashboard-button {
+    color: white;
+    margin: 0;
+}
+
+.All p, .RA7687-Scholars p, .Merit-Scholars p, .JLSS-Scholars p {
+    font-size: 1.8rem; /* Larger text for the count */
+    margin: 0; /* Remove default margin */
+    flex-grow: 1; /* Take up remaining space */
+    display: flex;
+    justify-content: center; /* Horizontally center the text */
+    align-items: center; /* Vertically center the text */
+}
+
+/* Style for buttons */
+.dashboard-button,
+.create-scholar-button {
+    width: 15%;
+    height: 6vh;
     background: #334F7D;
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin: 0 30px 20px;
-    display: inline-block;
-  }
-  
-  .dashboard-button:hover {
-    background: #2a3e5c;
-    transform: scale(1.05);
-  }
-  
-  /* =========================
-     CREATE SCHOLAR BUTTON
-     ========================= */
-  .create-button {
-    background-color: #334F7D;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 15px;
-    font-size: 0.95rem;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.3s ease;
-  }
-  
-  .create-button:hover {
-    background-color: #2a3e5c;
-  }
-  
-  /* =========================
-     TABLE STYLING
-     ========================= */
-  .dashboard-table {
-    width: 95%;
-    margin: 0 auto;
-    border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  
-  .dashboard-table th, .dashboard-table td {
-    padding: 12px 15px;
-    text-align: left;
-  }
-  
-  .dashboard-table thead {
-    background-color: #4a5ea6;
-    color: white;
-  }
-  
-  .dashboard-table tbody tr {
-    border-bottom: 1px solid #e1e1e1;
-  }
-  
-  .dashboard-table tbody tr:hover {
-    background-color: #f9f9f9;
-  }
-  
-  /* =========================
-     ACTION BUTTONS
-     ========================= */
-  .archive-button {
-    background-color: #f0ad4e;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 0.85rem;
-  }
-  
-  .reactivate-button {
-    background-color: #5cb85c;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 0.85rem;
-  }
-  
-  /* =========================
-     MODAL STYLING
-     ========================= */
-     .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      
-        /* ✅ Flexbox centering fix */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        box-sizing: border-box;
-      }
-  
-      .modal-content {
-        background-color: white;
-        padding: 25px;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 600px; /* ✅ Fixed width to prevent stretching */
-        max-height: 90vh;
-        overflow-y: auto;
-        position: relative;
-        box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
-        animation: slideIn 0.25s ease-in-out;
-      }
-  
-  .modal-content h2 {
-    margin-top: 0;
-    color: #334F7D;
-  }
-  
-  .modal-content .close {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 28px;
-    cursor: pointer;
-    color: #666;
-  }
-  
-  .create-form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: block;
-  }
-  
-  .form-group input {
-    padding: 8px;
-    width: 100%;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-  
-  .form-actions {
-    text-align: right;
-  }
-  
-  .submit-button {
-    padding: 10px 20px;
-    background-color: #334F7D;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .submit-button:hover {
-    background-color: #2a3e5c;
-  }
-  @keyframes slideIn {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  .step-navigation {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .step-navigation button {
-    background: #334F7D;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  
-  .step-navigation button:hover {
-    background: #2a3e5c;
-  }
-  
-  .step-title {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-size: 20px;
-    color: #334F7D;
-    font-weight: bold;
-  }
-  
-  .step-indicator {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    gap: 10px;
-  }
-  
-  .step-indicator .circle {
-    width: 30px;
-    height: 30px;
-    background: #ccc;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 30px;
-    font-weight: bold;
-    color: white;
-  }
-  
-  .step-indicator .circle.active {
-    background: #334F7D;
-  }
-  
-  .step-indicator .line {
-    flex: 1;
-    height: 4px;
-    background: #ccc;
-    margin-top: 13px;
-  }
-  
-  .step-indicator .line.active {
-    background: #334F7D;
-  }
-  
-  
+    margin-left:40px;
+}

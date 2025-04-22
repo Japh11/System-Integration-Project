@@ -14,7 +14,8 @@ const connect = (userId, onMessageReceived, onConnected, onError) => {
   }
 
   // Create SockJS WebSocket connection
-  const socket = new SockJS("http://localhost:8080/ws"); // endpoint matches backend
+  const socket = new SockJS(`${process.env.ISKOLAIR_API_URL || "http://localhost:8080"}/ws`); // Use environment variable for WebSocket endpoint
+
 
   // Initialize STOMP client
   stompClient = Stomp.over(socket);

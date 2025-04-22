@@ -2,7 +2,6 @@ package com.Capstone.IskoLAIR.Entity;
 
 import jakarta.persistence.*;
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chat_messages")
@@ -21,7 +20,7 @@ public class ChatMessage {
     private String recipientRole;
     
     @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private Date timestamp;
 
     @Enumerated(EnumType.STRING)
     private MessageStatus status;
@@ -101,11 +100,11 @@ public class ChatMessage {
         this.content = content;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

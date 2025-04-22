@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const SCHOLAR_API_URL = "http://localhost:8080/api/scholar"; 
+const SCHOLAR_API_URL = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/scholar";
+
 
 const ScholarChangePasswordApi = {
     requestPasswordReset: async (email) => {

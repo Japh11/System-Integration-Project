@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import ScholarApi from "../services/ScholarApi";
 import AssignmentApi from "../services/AssignmentApi";
 import AnnouncementApi from "../services/AnnouncementApi";
-import { getSubmissionsByScholar, undoSubmission } from "../services/SubmissionApi";
+import { getSubmissionsByScholar } from "../services/SubmissionApi";
+import logo from "../assets/IskoLAIR_Logo.png";
 import axios from "axios";
 import "../pages/css/ScholarDashboard.css";
-
-import ScholarHeader from "../components/ScholarHeader";
-import ScholarNavbar from "../components/ScholarNavbar";
 
 const ScholarDashboard = () => {
   const [scholar, setScholar] = useState(null);
@@ -77,33 +75,31 @@ const ScholarDashboard = () => {
   }, [scholar]);
 
   const handleFileChange = (e, assignmentId) => {
-    const newFiles = Array.from(e.target.files);
     setSelectedFiles(prev => ({
       ...prev,
-      [assignmentId]: prev[assignmentId]
-        ? [...prev[assignmentId], ...newFiles]
-        : newFiles
+      [assignmentId]: e.target.files[0]
     }));
   };
 
   const handleSubmitAssignment = async assignmentId => {
-    const files = selectedFiles[assignmentId];
-    if (!files || files.length === 0) {
-      setMessage("Please select at least one file before submitting.");
+    const file = selectedFiles[assignmentId];
+    if (!file) {
+      setMessage("Please select a file before submitting.");
       return;
     }
-
     const scholarId = scholar?.id;
+    if (!scholarId) {
+      setMessage("Scholar details not found. Please log in again.");
+      return;
+    }
     const token = localStorage.getItem("token");
-    if (!scholarId || !token) {
-      setMessage("Unauthorized: Please log in again.");
+    if (!token) {
+      setMessage("Unauthorized: No token found. Please log in.");
       return;
     }
 
     const formData = new FormData();
-    for (let file of files) {
-      formData.append("files", file);
-    }
+    formData.append("file", file);
 
     try {
       const response = await axios.post(
@@ -130,29 +126,6 @@ const ScholarDashboard = () => {
       );
     }
   };
-
-  const handleUndoTurnIn = async (submissionId) => {
-    try {
-      await undoSubmission(submissionId);
-      setSubmissions(prev =>
-        prev.map(s =>
-          s.id === submissionId ? { ...s, status: "unsubmitted" } : s
-        )
-      );
-      setMessage("Submission undone successfully.");
-    } catch (err) {
-      console.error("Undo error", err);
-      setError("Failed to undo submission. Try again.");
-    }
-  };
-
-  const hasSubmitted = id => {
-    const sub = submissions.find(s => s.assignment?.id === id);
-    return sub && (sub.status === "unverified" || sub.status === "verified");
-  };
-
-  const getSubmission = id =>
-    submissions.find(s => s.assignment?.id === id);
 
   const handleFilterChange = status => {
     switch (status) {
@@ -181,11 +154,33 @@ const ScholarDashboard = () => {
     }
   };
 
+  const hasSubmitted = id =>
+    submissions.some(s => s.assignment?.id === id);
+
+  const getSubmission = id =>
+    submissions.find(s => s.assignment?.id === id);
+
   return (
     <div>
-      <ScholarHeader />
-        <div className="chat-body">
-          <ScholarNavbar />
+      <div className="scholar-header">
+        <img src={logo} alt="IskoLAIR Logo" className="logo" />
+        <img
+          src="https://via.placeholder.com/40"
+          alt="Profile"
+          style={{ width: 40, height: 40, cursor: "pointer" }}
+          onClick={() => navigate("/scholar/profile")}
+        />
+      </div>
+
+      <div className="scholar-dashboard">
+        <div className="scholar-navigationbar">
+          <button onClick={() => navigate("/scholar/dashboard")}>Home</button>
+          <button onClick={() => navigate("/scholar/announcements")}>Announcements</button>
+          <button onClick={() => navigate("/scholar/assignments")}>Assignments</button>
+          <button onClick={() => navigate("/scholar/resources")}>Resources</button>
+          <button onClick={() => navigate("/scholar/aboutus")}>About Us</button>
+          <button onClick={() => navigate("/Smessages")}>Chat</button>
+        </div>
 
         <div className="scholar-dashboard-content">
           <div className="scholar-first-half">
@@ -214,54 +209,28 @@ const ScholarDashboard = () => {
                       return (
                         <li key={a.id}>
                           <strong>{a.title}</strong>
-                          <p>
-                            Submission Status:{" "}
-                            {sub
-                              ? sub.status === "verified"
-                                ? "Verified ✅"
-                                : sub.status === "unsubmitted"
-                                ? "Undone"
-                                : "Submitted (Pending)"
-                              : "Not submitted"}
-                          </p>
+                          <p>Submission Status: {sub?.status ?? "Not submitted"}</p>
                           {done ? (
                             <>
-                              <button onClick={() => handleUndoTurnIn(sub.id)}>Undo Turn‑In</button>
-                              <div>
-                                <p><strong>View Files:</strong></p>
-                                <ul>
-                                  {sub.filePath.split(",").map((path, i) => {
-                                    const fileName = path.split("\\").pop();
-                                    return (
-                                      <li key={i}>
-                                        <a
-                                          href={`http://localhost:8080/uploads/${fileName}`}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          download
-                                        >
-                                          {fileName}
-                                        </a>
-                                      </li>
-                                    );
-                                  })}
-                                </ul>
-                              </div>
+                              <button onClick={() => null}>Undo Turn‑In</button>
+                              <p>
+                                View File:{" "}
+                                <a
+                                  href={`http://localhost:8080/uploads/${sub.filePath.split("\\").pop()}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                >
+                                  {sub.filePath.split("\\").pop()}
+                                </a>
+                              </p>
                             </>
                           ) : (
                             <>
                               <input
                                 type="file"
-                                multiple
                                 onChange={(e) => handleFileChange(e, a.id)}
                               />
-                              {selectedFiles[a.id] && selectedFiles[a.id].length > 0 && (
-                                <ul>
-                                  {selectedFiles[a.id].map((file, idx) => (
-                                    <li key={idx}>{file.name}</li>
-                                  ))}
-                                </ul>
-                              )}
                               <button onClick={() => handleSubmitAssignment(a.id)}>
                                 Submit
                               </button>

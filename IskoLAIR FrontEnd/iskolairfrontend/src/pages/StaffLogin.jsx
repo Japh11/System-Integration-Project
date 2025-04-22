@@ -99,7 +99,7 @@ const StaffLoginForm = () => {
                                 />
                             </div>
 
-                            {/*<a href="/forgot-password" className="forgot-password">Forgot Password?</a>*/}
+                            <a href="/forgot-password" className="forgot-password">Forgot Password?</a>
 
                             <button type="submit" className="signin-button">Sign In</button>
                         </form>

@@ -4,10 +4,8 @@ import StaffApi from "../services/StaffApi";
 import ScholarApi from "../services/ScholarApi";
 import AssignmentApi from "../services/AssignmentApi";
 import AnnouncementApi from "../services/AnnouncementApi";
+import logo from "../assets/IskoLAIR_Logo.png"; 
 import "../pages/css/StaffDashboard.css"; // Import the CSS file for styling
-
-import StaffHeader from '../components/StaffHeader';
-import StaffNavbar from '../components/StaffNavbar';
 
 import Calendar from 'react-calendar';  // Import the Calendar component
 import 'react-calendar/dist/Calendar.css';
@@ -94,9 +92,55 @@ const StaffDashboard = () => {
 
     return (
         <div>
-            <StaffHeader />
-                <div className="staff-dashboard">
-                    <StaffNavbar />
+            <div className="staff-header">
+                <img src={logo} alt="IskoLAIR Logo" className="logo" />
+                {/* Dummy Profile Icon */}
+                <img
+                    src="https://via.placeholder.com/40"
+                    alt="Profile"
+                    style={{ width: "40px", height: "40px", cursor: "pointer" }}
+                    onClick={() => navigate("/staff/profile")} // Navigate to StaffProfile page
+                />
+            </div>
+            <div className="staff-dashboard">
+            <div className="Navigationbar">
+                <button
+                className={location.pathname === "/staff/dashboard" ? "active" : ""}
+                onClick={() => navigate("/staff/dashboard")}
+                >
+                    Home
+                </button>
+                <button
+                    className={location.pathname === "/announcements" ? "active" : ""}
+                    onClick={() => navigate("/announcements")}
+                    >
+                    Announcements
+                </button>
+                <button
+                    className={location.pathname === "/assignments" ? "active" : ""}
+                    onClick={() => navigate("/assignments")}
+                    >
+                    Assigments
+                </button>
+                <button
+                    className={location.pathname === "/messages" ? "active" : ""}
+                    onClick={() => navigate("/messages")}
+                    >
+                    Messages
+                </button>
+                <button
+                    className={location.pathname === "/resources" ? "active" : ""}
+                    onClick={() => navigate("/resources")}
+                >
+                    Resources
+                </button>
+                {/*<button
+                    className={location.pathname === "/faq" ? "active" : ""}
+                    onClick={() => navigate("/faq")}
+                    >
+                    FAQ
+                </button> */}
+            </div>
 
                 <div className="staff-content">
                     <div className="first-half">

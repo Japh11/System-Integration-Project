@@ -21,6 +21,4 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     @Query("SELECT s FROM Submission s JOIN FETCH s.scholar WHERE s.assignment.id = :assignmentId")
     List<Submission> findByAssignmentId(@Param("assignmentId") Long assignmentId);
-
-    Submission findByAssignmentIdAndScholarId(Long assignmentId, Long scholarId);
 }

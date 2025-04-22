@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/announcements"; // Adjust based on your backend mapping
+const API_URL = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/announcements"; // Use the environment variable
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem("token");

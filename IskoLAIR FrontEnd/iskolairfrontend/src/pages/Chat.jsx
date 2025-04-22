@@ -1,34 +1,21 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
 import ChatApi from "../services/ChatApi";
-import logo from "../assets/IskoLAIR_Logo.png";
-import tempProfile from "../assets/temp-profile.jpg";
-import "../pages/css/ScholarDashboard.css";
-import "../pages/css/Chat.css";
-
-import ScholarNavbar from "../components/ScholarNavbar";
-import ScholarHeader from "../components/ScholarHeader";
-import StaffNavbar from "../components/StaffNavbar";
-import StaffHeader from "../components/StaffHeader";
 
 const Chat = () => {
   const [contacts, setContacts] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState({});
   const [activeContact, setActiveContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [msgInput, setMsgInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const bottomRef = useRef(null);
-
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const role = localStorage.getItem("role");
     const token = localStorage.getItem("token");
 
     if (!role || !token) {
+      console.error("❌ Missing role or token");
       setErrorMessage("Authentication token or role is missing");
       return;
     }
@@ -48,6 +35,7 @@ const Chat = () => {
     }
 
     if (!id) {
+      console.error("❌ User ID not found in localStorage");
       setErrorMessage("User ID not found");
       return;
     }
@@ -66,79 +54,59 @@ const Chat = () => {
     return () => ChatApi.disconnect();
   }, []);
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   const fetchContacts = async (userId, role) => {
     try {
       const token = localStorage.getItem("token");
+
       const response = await axios.get(
         `http://localhost:8080/api/contacts?userId=${userId}&role=ROLE_${role}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
-      // Fetch profile pictures for each contact
-      const contactsWithPictures = await Promise.all(
-        response.data.map(async (contact) => {
-          try {
-            console.log(`Fetching profile picture for role: ${contact.role}, id: ${contact.id}`);
-            const profilePictureResponse = await axios.get(
-              `http://localhost:8080/api/${contact.role.toLowerCase()}/${contact.id}/profile-picture`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            );
-            return { ...contact, profilePicture: profilePictureResponse.data.url };
-          } catch (error) {
-            console.error(`Error fetching profile picture for ${contact.id}:`, error);
-            return { ...contact, profilePicture: tempProfile }; // Use default profile picture on error
-          }
-        })
-      );
-  
-      setContacts(contactsWithPictures);
+
+      setContacts(response.data);
     } catch (error) {
-      console.error("Error fetching contacts:", error.response?.data || error.message);
-      setErrorMessage("Error fetching contacts.");
+      console.error("❌ Error fetching contacts:", error);
+      setErrorMessage("Error fetching contacts. Please try again.");
     }
   };
 
   const fetchMessages = async (senderId, recipientId, senderRole, recipientRole) => {
     try {
       const token = localStorage.getItem("token");
+
       const response = await axios.get(
         `http://localhost:8080/api/messages?senderId=${senderId}&senderRole=${senderRole}&recipientId=${recipientId}&recipientRole=${recipientRole}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+
       const sorted = [...response.data].sort(
         (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
       );
+
       setMessages(sorted);
-      setTimeout(scrollToBottom, 100); // wait for DOM to update
     } catch (error) {
-      console.error("Failed to fetch messages", error);
+      console.error("❌ Failed to fetch chat messages", error);
     }
   };
 
   const handleContactClick = async (user) => {
     setActiveContact(user);
+
     const recipientRole = user.role?.startsWith("ROLE_")
       ? user.role.replace("ROLE_", "")
       : user.role;
+
     await fetchMessages(currentUser.id, user.id.toString(), currentUser.role, recipientRole);
   };
 
   const handleIncomingMessage = (msg) => {
-    setMessages((prev) => {
-      const updated = [...prev, msg].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-      setTimeout(scrollToBottom, 100);
-      return updated;
-    });
+    setMessages((prev) =>
+      [...prev, msg].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+    );
   };
 
   const sendMessage = () => {
@@ -150,117 +118,100 @@ const Chat = () => {
 
     const message = {
       senderId: currentUser.id,
-      senderName: `${currentUser.firstName} ${currentUser.lastName}`.trim(),
+      senderName: `${currentUser.firstName ?? ""} ${currentUser.lastName ?? ""}`.trim(),
       senderRole: currentUser.role,
       recipientId: activeContact.id.toString(),
       recipientName: `${activeContact.firstName} ${activeContact.lastName}`,
-      recipientRole,
-      content: msgInput.trim(),
+      recipientRole: recipientRole,
+      content: msgInput,
       timestamp: new Date(),
     };
 
     ChatApi.sendMessage(message);
-    setMessages((prev) => {
-      const updated = [...prev, message].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-      setTimeout(scrollToBottom, 100);
-      return updated;
-    });
+    setMessages((prev) =>
+      [...prev, message].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+    );
     setMsgInput("");
   };
 
-  if (!currentUser) return <div className="chat-wrapper">Loading chat...</div>;
-
-  const isStaff = currentUser?.role?.toUpperCase() === "STAFF";
-
   return (
-    <div className="chat-wrapper">
-      {isStaff ? <StaffHeader /> : <ScholarHeader />}
-      <div className="chat-body">
-        {isStaff ? <StaffNavbar /> : <ScholarNavbar />}
 
-        <div className="chat-container">
-          <div className="contact-list">
-            <h3>Contacts</h3>
-            {contacts.length > 0 ? (
-              contacts.map((user) => (
-                <div
-                key={user.id}
-                className={`contact-item ${activeContact?.id === user.id ? "active" : ""}`}
-                onClick={() => handleContactClick(user)}
-              >
-                <img
-                  src={user.profilePicture || tempProfile}
-                  alt="Profile"
-                  className="contact-avatar"
-                />
-                <div className="contact-name">{user.firstName} {user.lastName}</div>
-              </div>
-              ))
-            ) : (
-              <p>No contacts available.</p>
-            )}
-          </div>
+    
 
-          <div className="chat-box">
-            {activeContact ? (
-              <>
-                <div className="chat-header">
-                  <img
-                    src={activeContact?.profilePicture || tempProfile}
-                    alt="Avatar"
-                    className="chat-avatar"
-                  />
-                  <h4>{activeContact.firstName} {activeContact.lastName}</h4>
-                </div>
+    <div style={{ display: "flex", gap: "30px" }}>
+      <div style={{ width: "30%", borderRight: "1px solid #ccc", padding: "10px" }}>
+        <h3>Contacts ({currentUser.role})</h3>
+        {contacts.length > 0 ? (
+          contacts.map((user) => (
+            <div
+              key={user.id}
+              onClick={() => handleContactClick(user)}
+              style={{ cursor: "pointer", padding: "5px" }}
+            >
+              {user.firstName} {user.lastName} ({user.role})
+            </div>
+          ))
+        ) : (
+          <p>No contacts available.</p>
+        )}
+      </div>
 
-                <div className="chat-history">
-                  {messages
-                    .filter((m) => m.content && m.content.trim() !== "")
-                    .map((m, i) => {
-                      const isSender =
-                        m.senderId?.toString() === currentUser.id &&
-                        m.senderRole?.toUpperCase() === currentUser.role?.toUpperCase();
+      <div style={{ width: "70%", padding: "10px" }}>
+        {activeContact ? (
+          <>
+            <h4>
+              Chatting with {activeContact.firstName} {activeContact.lastName}
+            </h4>
+            <div
+              style={{
+                height: "300px",
+                overflowY: "scroll",
+                border: "1px solid gray",
+                padding: "10px",
+              }}
+            >
+              {messages.map((m, i) => {
+                const isSender =
+                  m.senderId?.toString() === currentUser.id &&
+                  m.senderRole?.toUpperCase() === currentUser.role?.toUpperCase();
 
-                      const time = new Date(m.timestamp).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      });
-
-                      return (
-                        <React.Fragment key={i}>
-                          <div className={`chat-bubble ${isSender ? "sent" : "received"}`}>
-                            <div className="bubble-content">{m.content}</div>
-                          </div>
-                          <div className={`timestamp ${isSender ? "align-right" : "align-left"}`}>
-                            {time}
-                          </div>
-                        </React.Fragment>
-                      );
-                    })}
-                  <div ref={bottomRef} />
-                </div>
-
-                <div className="chat-input">
-                  <input
-                    type="text"
-                    value={msgInput}
-                    onChange={(e) => setMsgInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                      }
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      textAlign: isSender ? "right" : "left",
+                      marginBottom: "10px",
                     }}
-                    placeholder="Type your message..."
-                  />
-                  <button onClick={sendMessage}>Send</button>
-                </div>
-              </>
-            ) : (
-              <div className="chat-empty">Select a contact to start chatting.</div>
-            )}
-          </div>
-        </div>
+                  >
+                    <div
+                      style={{
+                        display: "inline-block",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        backgroundColor: isSender ? "#d1f0d1" : "#f1f1f1",
+                        maxWidth: "70%",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      <b>{m.senderName}:</b>
+                      <br />
+                      {m.content}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <input
+              type="text"
+              value={msgInput}
+              onChange={(e) => setMsgInput(e.target.value)}
+              style={{ width: "70%", marginTop: "10px" }}
+            />
+            <button onClick={sendMessage}>Send</button>
+          </>
+        ) : (
+          <p>Select a contact to start chatting.</p>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 import axios from "axios";
 
-const API_URL_ADMIN = "http://localhost:8080/api/admin"; 
-const API_URL_STAFF = "http://localhost:8080/api/staff"; 
-const API_URL_AUTH = "http://localhost:8080/api/auth"; 
+const API_URL_ADMIN = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/admin"; // Use the environment variable
+const API_URL_STAFF = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/staff"; // Use the environment variable
+const API_URL_AUTH = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/auth"; // Use the environment variable
+
 
 const StaffApi = {
     getVisibleStaff: async () => {
@@ -105,26 +106,24 @@ const StaffApi = {
         }
     },
 
-    archiveStaff: async (id) => {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("Unauthorized: No token found");
-    
-        const response = await axios.delete(`http://localhost:8080/api/staff/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-    
-        return response.data;
-    },
-    
-    reactivateStaff: async (id) => {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("Unauthorized: No token found");
-    
-        const response = await axios.put(`http://localhost:8080/api/staff/reactivate/${id}`, {}, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-    
-        return response.data;
+    deleteStaff: async (id) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                throw new Error("Unauthorized: No token found");
+            }
+
+            const response = await axios.delete(`${API_URL_STAFF}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            console.log("✅ Staff Deletion Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("❌ Error Deleting Staff:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.error || "Failed to delete staff");
+        }
     },
 
     getAllStaff: async () => {
@@ -145,50 +144,6 @@ const StaffApi = {
         } catch (error) {
             console.error("❌ Error Fetching Staff List:", error.response?.data || error.message);
             throw new Error(error.response?.data?.error || "Failed to fetch staff list");
-        }
-    },
-    getProfilePicture: async (id) => {
-        try {
-            const token = localStorage.getItem("token");
-
-            if (!token) {
-                throw new Error("Unauthorized: No token found");
-            }
-
-            const response = await axios.get(`${API_URL_STAFF}/${id}/profile-picture`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            console.log("✅ Fetched Profile Picture URL:", response.data);
-            return response.data;
-        } catch (error) {
-            console.error("❌ Error Fetching Profile Picture:", error.response?.data || error.message);
-            throw new Error(error.response?.data?.error || "Failed to fetch profile picture");
-        }
-    },
-    uploadProfilePicture: async (id, file) => {
-        try {
-            const token = localStorage.getItem("token");
-
-            if (!token) {
-                throw new Error("Unauthorized: No token found");
-            }
-
-            const formData = new FormData();
-            formData.append("file", file);
-
-            const response = await axios.post(`${API_URL_STAFF}/${id}/upload-profile-picture`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
-            console.log("✅ Profile Picture Upload Response:", response.data);
-            return response.data;
-        } catch (error) {
-            console.error("❌ Error Uploading Profile Picture:", error.response?.data || error.message);
-            throw new Error(error.response?.data?.error || "Failed to upload profile picture");
         }
     },
 };

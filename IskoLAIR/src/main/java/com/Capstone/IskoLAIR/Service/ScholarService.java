@@ -63,26 +63,10 @@ public class ScholarService {
         throw new RuntimeException("Scholar not found");
     }
 
-    public void archiveScholar(Long id) {
-        Optional<OurScholars> scholarOpt = scholarRepository.findById(id);
-        if (scholarOpt.isPresent()) {
-            OurScholars scholar = scholarOpt.get();
-            scholar.setArchived(true);
-            scholarRepository.save(scholar);
-        } else {
-            throw new RuntimeException("Scholar not found");
-        }
-    }
-    
-    public void reactivateScholar(Long id) {
-        Optional<OurScholars> scholarOpt = scholarRepository.findById(id);
-        if (scholarOpt.isPresent()) {
-            OurScholars scholar = scholarOpt.get();
-            if (!scholar.isArchived()) {
-                throw new RuntimeException("Scholar is already active");
-            }
-            scholar.setArchived(false);
-            scholarRepository.save(scholar);
+    // ✅ Delete scholar by ID
+    public void deleteScholar(Long id) {
+        if (scholarRepository.existsById(id)) {
+            scholarRepository.deleteById(id);
         } else {
             throw new RuntimeException("Scholar not found");
         }
@@ -91,13 +75,6 @@ public class ScholarService {
     public OurScholars findByEmail(String email) {
         return scholarRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Scholar not found with email: " + email));
-    }
-    public Optional<OurScholars> findById(Long id) {
-        return scholarRepository.findById(id);
-    }
-
-    public OurScholars save(OurScholars scholar) {
-        return scholarRepository.save(scholar);
     }
     
 }

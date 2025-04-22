@@ -43,6 +43,12 @@ public class StaffService {
         }
         return staffRepository.save(staff);
     }
+    public void deleteStaff(Long id) {
+        if (!staffRepository.existsById(id)) {
+            throw new RuntimeException("Staff not found");
+        }
+        staffRepository.deleteById(id);
+    }
     
     public Staff getStaffById(Long id) {
         Optional<Staff> staff = staffRepository.findById(id);

@@ -9,9 +9,6 @@ import profileImg from '../assets/temp-profile.jpg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
-import StaffHeader from '../components/StaffHeader';
-import StaffNavbar from '../components/StaffNavbar';
-
 const Resources = () => {
   const [resources, setResources] = useState([]);
   const [error, setError] = useState("");
@@ -40,9 +37,51 @@ const Resources = () => {
 
   return (
     <div className="resources-page">
-      <StaffHeader />
-      <div className="staff-dashboard">
-        <StaffNavbar />
+      <div className="staff-header">
+        <img src={logo} alt="Logo" className="logo"/>
+        <img src={profileImg} alt="Profile" className="profile-icon"
+             onClick={()=>navigate("/staff/profile")}/>
+      </div>
+
+      <div className="resources-container">
+      <div className="Navigationbar">
+        <button
+          className={location.pathname === "/staff/dashboard" ? "active" : ""}
+          onClick={() => navigate("/staff/dashboard")}
+          >
+            Home
+          </button>
+          <button
+            className={location.pathname === "/announcements" ? "active" : ""}
+            onClick={() => navigate("/announcements")}
+            >
+              Announcements
+          </button>
+          <button
+            className={location.pathname === "/assignments" ? "active" : ""}
+            onClick={() => navigate("/assignments")}
+            >
+              Assigments
+          </button>
+          <button
+            className={location.pathname === "/messages" ? "active" : ""}
+            onClick={() => navigate("/messages")}
+            >
+              Messages
+          </button>
+          <button
+            className={location.pathname === "/resources" ? "active" : ""}
+            onClick={() => navigate("/resources")}
+          >
+            Resources
+          </button>
+          {/*<button
+            className={location.pathname === "/faq" ? "active" : ""}
+            onClick={() => navigate("/faq")}
+            >
+              FAQ
+          </button> */}
+      </div>
 
         <div className="resources-content">
           <ResourcesForm
@@ -88,34 +127,12 @@ const Resources = () => {
                     <h2 className="resource-title">{r.title}</h2>
                   </div>
                   <div className="resources-file">
-                    <div className="resource-file-wrapper">
-                      {/* File type icon or image preview */}
-                      {r.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                        <img src={r.fileUrl} alt={r.title} className="resource-image" />
-                      ) : (
-                        <div className="resource-icon">
-                          📄
-                        </div>
-                      )}
-
-                      {/* File name */}
-                      <div className="resource-filename">
-                        {decodeURIComponent(r.fileUrl.split('/').pop())}
-                      </div>
-
-                      {/* Download icon (right) */}
-                      <div className="resource-download">
-                        <a
-                          href={r.fileUrl}
-                          download
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Download file"
-                        >
-                          <GetAppIcon sx={{ fontSize: 28, color: "#334f7d" }} />
+                    {r.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i)
+                      ? <img src={r.fileUrl} alt={r.title} className="resource-image"/>
+                      : <a href={r.fileUrl} target="_blank" rel="noopener noreferrer">
+                          <GetAppIcon/> Download
                         </a>
-                      </div>
-                    </div>
+                    }
                   </div>
                 </li>
               ))}

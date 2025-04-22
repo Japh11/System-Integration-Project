@@ -54,8 +54,6 @@ public class SecurityConfig {
 
                 // Admin & Staff can register scholars
                 .requestMatchers("/api/admin/register-scholar").hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
-                .requestMatchers("/api/staff/reactivate/{id}").hasAnyAuthority("ROLE_ADMIN")
-                .requestMatchers("/api/scholar/reactivate/{id}").hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
                 .requestMatchers("/api/staff/visible").hasAnyAuthority("ROLE_SCHOLAR", "ROLE_STAFF", "ROLE_ADMIN")
 
                 // Scholar Routes - Only SCHOLAR can access
@@ -127,7 +125,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

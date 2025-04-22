@@ -1,23 +1,17 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/submissions";
+const API_URL = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/submissions"; // Use the environment variable
 
-export const submitAssignment = async (assignmentId, scholarId, files) => {
+
+export const submitAssignment = async (assignmentId, scholarId, file) => {
   const formData = new FormData();
-  Array.from(files).forEach((file) => {
-    formData.append("files", file); // match backend's @RequestParam("files")
-  });
-
-  const token = localStorage.getItem("token");
+  formData.append("file", file);
 
   const response = await axios.post(
     `${API_URL}/submit/${assignmentId}/${scholarId}`,
     formData,
     {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     }
   );
 
@@ -72,23 +66,6 @@ export const verifySubmission = async (submissionId) => {
       Authorization: `Bearer ${token}`, // Include the token in the Authorization header
     },
   });
-
-  return response.data;
-};
-
-export const undoSubmission = async (submissionId) => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No token");
-
-  const response = await axios.patch(
-    `http://localhost:8080/api/submissions/undo/${submissionId}`,
-    null,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
 
   return response.data;
 };

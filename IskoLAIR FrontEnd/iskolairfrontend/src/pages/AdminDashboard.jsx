@@ -52,7 +52,6 @@ const AdminDashboard = () => {
   const [scholarForm, setScholarForm]   = useState(emptyScholar);
   const [staffForm, setStaffForm]       = useState(emptyStaff);
   const [message, setMessage]           = useState("");
-  const [currentStep, setCurrentStep] = useState(1);
 
   // — load on mount
   useEffect(() => {
@@ -81,7 +80,6 @@ const AdminDashboard = () => {
   // — CRUD Handlers for Scholars
   const openScholarModal = sch => {
     setScholarForm(sch || emptyScholar);
-    setCurrentStep(1);
     setMessage("");
     setShowScholarForm(true);
   };
@@ -108,22 +106,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleArchiveScholar = async id => {
-    if (!window.confirm("Archive this scholar?")) return;
+  const handleDeleteScholar = async id => {
+    if (!window.confirm("Delete this scholar?")) return;
     try {
-      await ScholarApi.archiveScholar(id);
+      await ScholarApi.deleteScholar(id);
       fetchScholars();
     } catch (e) {
-      console.error("Archive failed:", e);
-    }
-  };
-  
-  const handleReactivateScholar = async id => {
-    try {
-      await ScholarApi.reactivateScholar(id);
-      fetchScholars();
-    } catch (e) {
-      console.error("Reactivation failed:", e);
+      console.error("Delete failed:", e);
     }
   };
 
@@ -155,22 +144,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleArchiveStaff = async (id) => {
-    if (!window.confirm("Archive this staff?")) return;
+  const handleDeleteStaff = async id => {
+    if (!window.confirm("Delete this staff?")) return;
     try {
-      await StaffApi.archiveStaff(id);
+      await StaffApi.deleteStaff(id);
       fetchStaff();
     } catch (e) {
-      console.error("Archive failed:", e);
-    }
-  };
-  
-  const handleReactivateStaff = async (id) => {
-    try {
-      await StaffApi.reactivateStaff(id);
-      fetchStaff();
-    } catch (e) {
-      console.error("Reactivate failed:", e);
+      console.error("Delete failed:", e);
     }
   };
 
@@ -208,7 +188,6 @@ const AdminDashboard = () => {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Account Status</th>
                 <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
@@ -217,18 +196,17 @@ const AdminDashboard = () => {
                 <tr key={s.id}>
                   <td>{s.firstName} {s.lastName}</td>
                   <td>{s.email}</td>
-                  <td>{s.archived ? "Archived" : "Active"}</td>
                   <td style={{ textAlign: "right" }}>
-                    <EditIcon
-                      style={{ cursor: "pointer", marginRight: 8 }}
-                      fontSize="small"
-                      onClick={() => openScholarModal(s)}
+                    <EditIcon 
+                      style={{ cursor: "pointer", marginRight: 8 }} 
+                      fontSize="small" 
+                      onClick={() => openScholarModal(s)} 
                     />
-                    {s.archived ? (
-                      <button className="reactivate-button" onClick={() => handleReactivateScholar(s.id)}>Reactivate</button>
-                    ) : (
-                      <button className="archive-button" onClick={() => handleArchiveScholar(s.id)}>Archive</button>
-                    )}
+                    <DeleteIcon 
+                      style={{ cursor: "pointer" }} 
+                      fontSize="small" 
+                      onClick={() => handleDeleteScholar(s.id)} 
+                    />
                   </td>
                 </tr>
               ))}
@@ -252,27 +230,25 @@ const AdminDashboard = () => {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Account Status</th>
                 <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-            {staffList.map(st => (
+              {staffList.map(st => (
                 <tr key={st.id}>
                   <td>{st.firstName} {st.lastName}</td>
                   <td>{st.email}</td>
-                  <td>{st.archived ? "Archived" : "Active"}</td>
                   <td style={{ textAlign: "right" }}>
                     <EditIcon 
                       style={{ cursor: "pointer", marginRight: 8 }} 
                       fontSize="small" 
                       onClick={() => openStaffModal(st)} 
                     />
-                    {st.archived ? (
-                      <button className="reactivate-button" onClick={() => handleReactivateStaff(st.id)}>Reactivate</button>
-                    ) : (
-                      <button className="archive-button" onClick={() => handleArchiveStaff(st.id)}>Archive</button>
-                    )}
+                    <DeleteIcon 
+                      style={{ cursor: "pointer" }} 
+                      fontSize="small" 
+                      onClick={() => handleDeleteStaff(st.id)} 
+                    />
                   </td>
                 </tr>
               ))}
@@ -281,109 +257,254 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-       {/* --- Scholar Modal --- */}
-      {showScholarForm && (
+      {/* --- Scholar Modal --- */}
+        {showScholarForm && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <span className="close" onClick={() => setShowScholarForm(false)}>&times;</span>
+            <div className="modal-content">
+            <span
+                className="close"
+                onClick={() => setShowScholarForm(false)}
+            >&times;</span>
+
             <h2>{scholarForm.id ? "Edit Scholar" : "Create Scholar"}</h2>
             {message && <p className="success-message">{message}</p>}
-            <div className="step-indicator">
-              {[1, 2, 3, 4].map(num => (
-                <React.Fragment key={num}>
-                  <div className={`circle ${currentStep === num ? 'active' : ''}`}>{num}</div>
-                  {num < 4 && <div className={`line ${currentStep >= num + 1 ? 'active' : ''}`}></div>}
-                </React.Fragment>
-              ))}
-            </div>
+
             <form onSubmit={handleSaveScholar} className="create-form">
-            {currentStep === 1 && (
-                <>
-                  <h3 className="step-title">Personal Details</h3>
-                  <div className="form-row">
-                    <div className="form-group"><label>Last Name</label><input name="lastName" value={scholarForm.lastName} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>First Name</label><input name="firstName" value={scholarForm.firstName} onChange={handleScholarChange} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label>Middle Name</label><input name="middleName" value={scholarForm.middleName} onChange={handleScholarChange} /></div>
-                    <div className="form-group short"><label>Sex</label><input name="sex" value={scholarForm.sex} onChange={handleScholarChange} required /></div>
-                    <div className="form-group short"><label>Birthday</label><input type="date" name="birthday" value={scholarForm.birthday} onChange={handleScholarChange} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label>Contact Number</label><input name="contactNumber" value={scholarForm.contactNumber} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>Email</label><input type="email" name="email" value={scholarForm.email} onChange={handleScholarChange} required /></div>
-                  </div>
-                </>
-              )}
+                <div className="form-group">
+                <label>Last Name</label>
+                <input
+                    type="text"
+                    name="lastName"
+                    value={scholarForm.lastName}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
 
-              {currentStep === 2 && (
-                <>
-                  <h3 className="step-title">Address Info</h3>
-                  <div className="form-row">
-                    <div className="form-group"><label>Barangay</label><input name="brgy" value={scholarForm.brgy} onChange={handleScholarChange} /></div>
-                    <div className="form-group"><label>Municipality</label><input name="municipality" value={scholarForm.municipality} onChange={handleScholarChange} /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label>Province</label><input name="province" value={scholarForm.province} onChange={handleScholarChange} /></div>
-                    <div className="form-group"><label>District</label><input name="district" value={scholarForm.district} onChange={handleScholarChange} /></div>
-                    <div className="form-group"><label>Region</label><input name="region" value={scholarForm.region} onChange={handleScholarChange} /></div>
-                  </div>
-                </>
-              )}
+                <div className="form-group">
+                <label>First Name</label>
+                <input
+                    type="text"
+                    name="firstName"
+                    value={scholarForm.firstName}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
 
-              {currentStep === 3 && (
-                <>
-                  <h3 className="step-title">Academic Info</h3>
-                  <div className="form-row">
-                    <div className="form-group"><label>Batch Year</label><input type="number" name="batchYear" value={scholarForm.batchYear} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>Account No.</label><input name="accountNo" value={scholarForm.accountNo} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>SPAS No.</label><input name="spasNo" value={scholarForm.spasNo} onChange={handleScholarChange} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label>Level/Year</label><input name="levelYear" value={scholarForm.levelYear} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>School</label><input name="school" value={scholarForm.school} onChange={handleScholarChange} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label>Course</label><input name="course" value={scholarForm.course} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>Status</label><input name="status" value={scholarForm.status} onChange={handleScholarChange} required /></div>
-                    <div className="form-group"><label>Type of Scholarship</label><input name="typeOfScholarship" value={scholarForm.typeOfScholarship} onChange={handleScholarChange} /></div>
-                  </div>
-                </>
-              )}
+                <div className="form-group">
+                <label>Middle Name</label>
+                <input
+                    type="text"
+                    name="middleName"
+                    value={scholarForm.middleName}
+                    onChange={handleScholarChange}
+                />
+                </div>
 
-                {currentStep === 4 && (
-                  <>
-                    <h3 className="step-title">Security Info</h3>
-                    {!scholarForm.id && (
-                      <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" value={scholarForm.password} onChange={handleScholarChange} required />
-                      </div>
-                    )}
-                  </>
+                <div className="form-group">
+                <label>Batch Year</label>
+                <input
+                    type="number"
+                    name="batchYear"
+                    value={scholarForm.batchYear}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Account No.</label>
+                <input
+                    type="text"
+                    name="accountNo"
+                    value={scholarForm.accountNo}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>SPAS No.</label>
+                <input
+                    type="text"
+                    name="spasNo"
+                    value={scholarForm.spasNo}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Sex</label>
+                <input
+                    type="text"
+                    name="gender"
+                    value={scholarForm.sex}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Level/Year</label>
+                <input
+                    type="text"
+                    name="levelYear"
+                    value={scholarForm.levelYear}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>School</label>
+                <input
+                    type="text"
+                    name="school"
+                    value={scholarForm.school}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Course</label>
+                <input
+                    type="text"
+                    name="course"
+                    value={scholarForm.course}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Status</label>
+                <input
+                    type="text"
+                    name="status"
+                    value={scholarForm.status}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Type of Scholarship</label>
+                <input
+                    type="text"
+                    name="typeOfScholarship"
+                    value={scholarForm.typeOfScholarship}
+                    onChange={handleScholarChange}
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Birthday</label>
+                <input
+                    type="date"
+                    name="birthday"
+                    value={scholarForm.birthday}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Contact Number</label>
+                <input
+                    type="tel"
+                    name="contactNumber"
+                    value={scholarForm.contactNumber}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Email</label>
+                <input
+                    type="email"
+                    name="email"
+                    value={scholarForm.email}
+                    onChange={handleScholarChange}
+                    required
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Barangay</label>
+                <input
+                    type="text"
+                    name="brgy"
+                    value={scholarForm.brgy}
+                    onChange={handleScholarChange}
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Municipality</label>
+                <input
+                    type="text"
+                    name="municipality"
+                    value={scholarForm.municipality}
+                    onChange={handleScholarChange}
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Province</label>
+                <input
+                    type="text"
+                    name="province"
+                    value={scholarForm.province}
+                    onChange={handleScholarChange}
+                />
+                </div>
+
+                <div className="form-group">
+                <label>District</label>
+                <input
+                    type="text"
+                    name="district"
+                    value={scholarForm.district}
+                    onChange={handleScholarChange}
+                />
+                </div>
+
+                <div className="form-group">
+                <label>Region</label>
+                <input
+                    type="text"
+                    name="region"
+                    value={scholarForm.region}
+                    onChange={handleScholarChange}
+                />
+                </div>
+
+                {!scholarForm.id && (
+                <div className="form-group">
+                    <label>Password</label>
+                    <input
+                    type="password"
+                    name="password"
+                    value={scholarForm.password}
+                    onChange={handleScholarChange}
+                    required
+                    />
+                </div>
                 )}
 
-              {/* Step Navigation */}
-              <div className="step-navigation">
-                {currentStep > 1 && (
-                  <button type="button" onClick={() => setCurrentStep(currentStep - 1)}>
-                    Back
-                  </button>
-                )}
-                {currentStep < 4 ? (
-                  <button type="button" onClick={() => setCurrentStep(currentStep + 1)}>
-                    Next
-                  </button>
-                ) : (
-                  <button type="submit" className="submit-button">
+                <div className="form-actions">
+                <button type="submit" className="submit-button">
                     {scholarForm.id ? "Update Scholar" : "Create Scholar"}
-                  </button>
-                )}
-              </div>
+                </button>
+                </div>
             </form>
-          </div>
+            </div>
         </div>
-      )}
+        )}
 
 
       {/* --- Staff Modal --- */}

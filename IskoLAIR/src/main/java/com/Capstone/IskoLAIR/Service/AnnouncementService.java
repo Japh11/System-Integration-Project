@@ -56,14 +56,6 @@ public class AnnouncementService {
     }
 
     public void deleteAnnouncement(Long id) {
-        Announcement announcement = announcementRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Announcement not found"));
-    
-        // Clear related scholars to avoid foreign key constraint issues
-        announcement.getScholars().clear();
-        announcementRepository.save(announcement);
-    
-        // Delete the announcement
         announcementRepository.deleteById(id);
     }
 }

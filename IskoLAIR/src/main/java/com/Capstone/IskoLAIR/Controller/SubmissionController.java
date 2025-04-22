@@ -23,9 +23,11 @@ public class SubmissionController {
     public ResponseEntity<Submission> submitAssignment(
             @PathVariable Long assignmentId,
             @PathVariable Long scholarId,
-            @RequestParam("files") MultipartFile[] files) throws IOException {
-    
-        Submission submission = submissionService.submitOrUpdateSubmission(assignmentId, scholarId, files);
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        Submission submission = submissionService.submitAssignment(assignmentId, scholarId, file);
+        submission.setStatus("unverified");
+
         return ResponseEntity.status(HttpStatus.CREATED).body(submission);
     }
         // New endpoint to fetch all submissions
@@ -64,21 +66,4 @@ public class SubmissionController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error verifying submission: " + e.getMessage());
             }
         }
-        @PatchMapping("/undo/{submissionId}")
-    public ResponseEntity<?> undoSubmission(@PathVariable Long submissionId) {
-        try {
-            Optional<Submission> submissionOpt = submissionService.getSubmissionById(submissionId);
-            if (submissionOpt.isPresent()) {
-                Submission submission = submissionOpt.get();
-                submission.setStatus("unsubmitted");
-                submissionService.saveSubmission(submission);
-                return ResponseEntity.ok("Submission undone successfully");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Submission not found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
-        }
-    }
-
 }

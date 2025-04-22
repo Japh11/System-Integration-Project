@@ -11,8 +11,6 @@
     min-height: 100vh;
     background-color: #f7f7f7;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-y: auto;
-    height: 100vh;
 }
 
 .admin-dashboard-header {
@@ -222,7 +220,7 @@
 .admin-dashboard-page .modal-content {
     border-radius: 25px;
     width: 90%;
-    max-width: 800px !important;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -235,7 +233,6 @@
 
 .admin-dashboard-page .submit-button {
     background: linear-gradient(90deg, #5365AD, #334F7D);
-    width: 200px;
     color: white;
     padding: 10px 25px;
     border: none;
@@ -247,7 +244,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.admin-dashboard-page .submit-button:hover {
+.submit-button:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     background: linear-gradient(90deg, #334F7D, #1a2d5c);
@@ -265,100 +262,4 @@
 
 .close:hover {
     color: #333;
-}
-
-.archive-button {
-    background-color: #f0ad4e;
-    color: white;
-    border: none;
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-.reactivate-button {
-    background-color: #5cb85c;
-    color: white;
-    border: none;
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.admin-dashboard-page .create-button {
-    background: linear-gradient(90deg, #5365AD, #334F7D);
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    margin-top: 10px;
-}
-
-.admin-dashboard-page .create-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(90deg, #334F7D, #1a2d5c);
-}
-
-/* Step title style */
-.step-title {
-    text-align: center;
-    font-size: 22px;
-    color: #334F7D;
-    margin-bottom: 15px;
-}
-
-/* Navigation buttons for steps */
-.step-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-/* Step indicator bar */
-.step-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-    gap: 10px;
-}
-.step-indicator .circle {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    font-weight: bold;
-    font-size: 16px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #ccc;
-    color: #fff;
-}
-.step-indicator .circle.active {
-    background-color: #334F7D;
-}
-.step-indicator .line {
-    height: 2px;
-    width: 40px;
-    background-color: #ccc;
-}
-.step-indicator .line.active {
-    background-color: #334F7D;
-}
-
-/* Two-column field layout */
-.form-row {
-    display: flex;
-    gap: 10px;
-}
-.form-row .form-group {
-    flex: 1;
-}
-.form-row .form-group.short {
-    flex: 0.5;
 }

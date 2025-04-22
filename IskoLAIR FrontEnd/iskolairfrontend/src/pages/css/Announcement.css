@@ -7,7 +7,7 @@
 
 body {
   overflow: hidden;
-  background-color: #EEEBF0;
+  background-color: #fbfbfb;
 }
 
 .icon {
@@ -282,45 +282,4 @@ body {
   font-size: 16px;
   border: 1px solid #ccc;
   text-align: left;
-}
-.announcement-photos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-start;
-}
-
-.announcement-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.announcement-image:hover {
-  transform: scale(1.05);
-}
-
-/* Lightbox styling */
-.lightbox-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.lightbox-image {
-  max-width: 90%;
-  max-height: 90%;
-  border-radius: 10px;
-  box-shadow: 0 0 15px #000;
-  cursor: zoom-out;
 }
