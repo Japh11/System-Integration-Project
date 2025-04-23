@@ -14,8 +14,9 @@ const connect = (userId, onMessageReceived, onConnected, onError) => {
   }
 
   // Create SockJS WebSocket connection
-  const socket = new SockJS(`${process.env.ISKOLAIR_API_URL || "http://localhost:8080"}/ws`); // Use environment variable for WebSocket endpoint
-
+  //const socket = new SockJS(`${process.env.ISKOLAIR_API_URL || "http://localhost:8080"}/ws`); // Use environment variable for WebSocket endpoint
+  const API_BASE_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+  const socket = new SockJS(`${API_BASE_URL}/ws`);
 
   // Initialize STOMP client
   stompClient = Stomp.over(socket);
@@ -72,7 +73,7 @@ const fetchContacts = async (userId, role) => {
       throw new Error("Token not found");
     }
     
-    const response = await axios.get(`http://localhost:8080/api/contacts?userId=${userId}&role=${role}`, {
+    const response = await axios.get(`${API_BASE_URL}/api/contacts?userId=${userId}&role=${role}`, {
       headers: {
         Authorization: `Bearer ${token}` // Ensure token is included
       }

@@ -19,6 +19,7 @@ const ScholarDashboard = () => {
   const [selectedFiles, setSelectedFiles] = useState({});
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
     const fetchScholarDetails = async () => {
@@ -103,7 +104,7 @@ const ScholarDashboard = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/submissions/submit/${assignmentId}/${scholarId}`,
+        `${API_URL}/api/submissions/submit/${assignmentId}/${scholarId}`,
         formData,
         {
           headers: {
@@ -216,7 +217,7 @@ const ScholarDashboard = () => {
                               <p>
                                 View File:{" "}
                                 <a
-                                  href={`http://localhost:8080/uploads/${sub.filePath.split("\\").pop()}`}
+                                  href={`${API_URL}/uploads/${sub.filePath.split("\\").pop()}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download

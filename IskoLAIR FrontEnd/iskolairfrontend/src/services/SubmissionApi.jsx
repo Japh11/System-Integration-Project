@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const API_URL = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/submissions"; // Use the environment variable
-
+//const API_URL = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/submissions"; // Use the environment variable
+const API_BASE_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+const API_URL = `${API_BASE_URL}/api/submissions`;
 
 export const submitAssignment = async (assignmentId, scholarId, file) => {
   const formData = new FormData();

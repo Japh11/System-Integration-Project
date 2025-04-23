@@ -16,6 +16,7 @@ const Assignment = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
     async function loadAssignments() {
@@ -172,7 +173,7 @@ const Assignment = () => {
               <p>
                 <strong>File:</strong>{" "}
                 <a
-                  href={`http://localhost:8080/uploads/${selectedSubmission.filePath.split("\\").pop()}`}
+                  href={`${API_URL}/uploads/${selectedSubmission.filePath.split("\\").pop()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   download

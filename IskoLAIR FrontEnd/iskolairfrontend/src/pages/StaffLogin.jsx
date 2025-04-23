@@ -13,6 +13,7 @@ const StaffLoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState("");
+    const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -20,7 +21,7 @@ const StaffLoginForm = () => {
         setMessage("");
 
         try {
-            const response = await axios.post("http://localhost:8080/api/auth/login-staff", {
+            const response = await axios.post(`${API_URL}/api/auth/login-staff`, {
                 email,
                 password,
             });

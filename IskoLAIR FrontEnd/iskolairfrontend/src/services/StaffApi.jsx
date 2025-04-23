@@ -1,9 +1,12 @@
 import axios from "axios";
 
-const API_URL_ADMIN = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/admin"; // Use the environment variable
-const API_URL_STAFF = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/staff"; // Use the environment variable
-const API_URL_AUTH = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/auth"; // Use the environment variable
-
+//const API_URL_ADMIN = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/admin"; // Use the environment variable
+//const API_URL_STAFF = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/staff"; // Use the environment variable
+//const API_URL_AUTH = process.env.ISKOLAIR_API_URL || "http://localhost:8080/api/auth"; // Use the environment variable
+const API_BASE_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+const API_URL_ADMIN = `${API_BASE_URL}/api/admin`;
+const API_URL_STAFF = `${API_BASE_URL}/api/staff`;
+const API_URL_AUTH = `${API_BASE_URL}/api/auth`;
 
 const StaffApi = {
     getVisibleStaff: async () => {

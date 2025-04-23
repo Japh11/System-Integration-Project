@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/auth";
+//const API_URL = "http://localhost:8080/api/auth";
+const BASE_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+const API_URL = `${BASE_URL}/api/auth`;
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");

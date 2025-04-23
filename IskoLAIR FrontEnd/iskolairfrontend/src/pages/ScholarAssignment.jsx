@@ -16,6 +16,7 @@ const ScholarAssignment = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
     fetchScholarData();
@@ -103,7 +104,7 @@ const ScholarAssignment = () => {
                             {s.filePath.split(",").map((file, idx) => (
                               <li key={idx}>
                                 <a
-                                  href={`http://localhost:8080/uploads/${file.trim().split("\\").pop()}`}
+                                  href={`${API_URL}/uploads/${file.trim().split("\\").pop()}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download
