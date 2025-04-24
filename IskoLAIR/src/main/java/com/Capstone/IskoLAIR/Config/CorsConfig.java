@@ -13,15 +13,20 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Allow all endpoints
-                        .allowedOrigins("http://localhost:5173") // Allow frontend requests from React
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow methods
-                        .allowedHeaders("*") // Allow all headers
-                        .allowCredentials(true); // Allow cookies and authentication headers
+                registry.addMapping("/**")
+                        .allowedOrigins(
+                            "http://localhost:5173", 
+                            "https://system-integration-project.vercel.app"
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
 
-                // Explicitly allow the staff route
                 registry.addMapping("/api/staff/register-scholar")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins(
+                            "http://localhost:5173", 
+                            "https://system-integration-project.vercel.app"
+                        )
                         .allowedMethods("POST")
                         .allowedHeaders("*")
                         .allowCredentials(true);
