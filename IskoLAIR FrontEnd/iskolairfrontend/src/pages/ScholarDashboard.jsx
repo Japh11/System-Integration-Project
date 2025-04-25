@@ -4,243 +4,134 @@ import ScholarApi from "../services/ScholarApi";
 import AssignmentApi from "../services/AssignmentApi";
 import AnnouncementApi from "../services/AnnouncementApi";
 import { getSubmissionsByScholar } from "../services/SubmissionApi";
-import logo from "../assets/IskoLAIR_Logo.png";
-import axios from "axios";
+import profilePlaceholder from "../assets/profiletemp.jpg";
 import "../pages/css/ScholarDashboard.css";
+
+import ScholarHeader from "../components/ScholarHeader";
+import ScholarNavbar from "../components/ScholarNavbar";
 
 const ScholarDashboard = () => {
   const [scholar, setScholar] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(profilePlaceholder);
   const [error, setError] = useState("");
   const [assignments, setAssignments] = useState([]);
-  const [filteredAssignments, setFilteredAssignments] = useState([]);
-  const [filter, setFilter] = useState("all");
   const [announcements, setAnnouncements] = useState([]);
   const [submissions, setSubmissions] = useState([]);
-  const [selectedFiles, setSelectedFiles] = useState({});
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
-    const fetchScholarDetails = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Unauthorized: No token found. Please log in.");
-        return;
-      }
+    const fetchScholarData = async () => {
       try {
-        const data = await ScholarApi.getScholarDetails();
-        setScholar(data);
+        const scholarData = await ScholarApi.getScholarDetails();
+        setScholar(scholarData);
+        setProfilePicture(scholarData.profilePicture || profilePlaceholder);
+
+        const assignmentData = await AssignmentApi.getAllAssignments();
+        setAssignments(assignmentData);
+
+        const submissionData = await getSubmissionsByScholar(scholarData.id);
+        setSubmissions(submissionData);
       } catch (err) {
-        setError(err.message.includes("No token")
-          ? "Your session has expired. Please log in again."
-          : "Failed to load scholar details. Please try again.");
+        setError("Failed to fetch data. Please log in again.");
+        console.error(err);
       }
     };
 
-    const fetchAssignments = async () => {
-      try {
-        const data = await AssignmentApi.getAllAssignments();
-        setAssignments(data);
-        setFilteredAssignments(data);
-      } catch {
-        setError("Failed to load assignments. Please try again.");
-      }
-    };
-
-    const fetchAnnouncements = async () => {
-      try {
-        const data = await AnnouncementApi.getAllAnnouncements();
-        setAnnouncements(data);
-      } catch {
-        setError("Failed to load announcements. Please try again.");
-      }
-    };
-
-    fetchScholarDetails();
-    fetchAssignments();
-    fetchAnnouncements();
+    fetchScholarData();
   }, []);
 
-  useEffect(() => {
-    const loadSubmissions = async () => {
-      if (!scholar?.id) return;
-      try {
-        const data = await getSubmissionsByScholar(scholar.id);
-        setSubmissions(data);
-      } catch (err) {
-        console.error("Failed to load submissions:", err);
-      }
-    };
-    loadSubmissions();
-  }, [scholar]);
-
-  const handleFileChange = (e, assignmentId) => {
-    setSelectedFiles(prev => ({
-      ...prev,
-      [assignmentId]: e.target.files[0]
-    }));
+  const hasSubmitted = (assignmentId) => {
+    const submission = submissions.find(s => s.assignment?.id === assignmentId);
+    return submission && (submission.status === "verified" || submission.status === "unverified");
   };
 
-  const handleSubmitAssignment = async assignmentId => {
-    const file = selectedFiles[assignmentId];
-    if (!file) {
-      setMessage("Please select a file before submitting.");
-      return;
-    }
-    const scholarId = scholar?.id;
-    if (!scholarId) {
-      setMessage("Scholar details not found. Please log in again.");
-      return;
-    }
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setMessage("Unauthorized: No token found. Please log in.");
-      return;
-    }
+  const submissionProgress = assignments.length > 0
+    ? Math.round((assignments.filter(a => hasSubmitted(a.id)).length / assignments.length) * 100)
+    : 0;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/api/submissions/submit/${assignmentId}/${scholarId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const newSubmission = response.data;
-      setSubmissions(prev => [...prev, newSubmission]);
-      setSelectedFiles(prev => ({ ...prev, [assignmentId]: null }));
-      setMessage("Assignment submitted successfully.");
-    } catch (err) {
-      console.error(err);
-      setMessage(
-        err.response?.status === 401
-          ? "Unauthorized: Please log in again."
-          : "Failed to submit assignment. Please try again."
-      );
-    }
-  };
-
-  const handleFilterChange = status => {
+  const getStatusColor = (status) => {
     switch (status) {
-      case "all":
-        setFilteredAssignments(assignments);
-        break;
-      case "completed":
-        setFilteredAssignments(assignments.filter(a => hasSubmitted(a.id)));
-        break;
-      case "pending":
-        setFilteredAssignments(assignments.filter(a => {
-          const sub = getSubmission(a.id);
-          const isPastDue = new Date(a.dueDate) < new Date();
-          return !sub && !isPastDue;
-        }));
-        break;
-      case "past due":
-        setFilteredAssignments(assignments.filter(a => {
-          const sub = getSubmission(a.id);
-          const isPastDue = new Date(a.dueDate) < new Date();
-          return !sub && isPastDue;
-        }));
-        break;
+      case "Good Standing":
+        return "#4caf50";
+      case "Continued under Probation":
+        return "#ff9800";
+      case "Continued under Partial Allowance":
+        return "#ffeb3b";
       default:
-        setFilteredAssignments(assignments);
+        return "#9e9e9e";
     }
   };
-
-  const hasSubmitted = id =>
-    submissions.some(s => s.assignment?.id === id);
-
-  const getSubmission = id =>
-    submissions.find(s => s.assignment?.id === id);
 
   return (
     <div>
-      <div className="scholar-header">
-        <img src={logo} alt="IskoLAIR Logo" className="logo" />
-        <img
-          src="https://via.placeholder.com/40"
-          alt="Profile"
-          style={{ width: 40, height: 40, cursor: "pointer" }}
-          onClick={() => navigate("/scholar/profile")}
-        />
-      </div>
-
-      <div className="scholar-dashboard">
-        <div className="scholar-navigationbar">
-          <button onClick={() => navigate("/scholar/dashboard")}>Home</button>
-          <button onClick={() => navigate("/scholar/announcements")}>Announcements</button>
-          <button onClick={() => navigate("/scholar/assignments")}>Assignments</button>
-          <button onClick={() => navigate("/scholar/resources")}>Resources</button>
-          <button onClick={() => navigate("/scholar/aboutus")}>About Us</button>
-          <button onClick={() => navigate("/Smessages")}>Chat</button>
-        </div>
+      <ScholarHeader />
+      <div className="chat-body">
+        <ScholarNavbar />
 
         <div className="scholar-dashboard-content">
           <div className="scholar-first-half">
-            <h2>Scholar Dashboard</h2>
+            <div className="scholar-profile-section">
+              <img src={profilePicture} alt="Profile" className="scholar-profile-pic" />
+              <div className="scholar-info">
+                <h3>{scholar?.firstName} {scholar?.lastName}</h3>
+                <p>{scholar?.typeOfScholarship}</p>
+              </div>
+            </div>
+            <div className="status-box">
+              <p>Status</p>
+              <div className="status-indicator" style={{ backgroundColor: getStatusColor(scholar?.status) }}>
+                {scholar?.status || "Unknown"}
+              </div>
+            </div>
           </div>
 
-          <div className="scholar-second-half">
-            <div className="scholar-assignment">
-              <div className="section-header">
-                <h3>Assignments</h3>
-                <div className="filter-buttons">
-                  <button onClick={() => handleFilterChange("all")}>All</button>
-                  <button onClick={() => handleFilterChange("pending")}>Pending</button>
-                  <button onClick={() => handleFilterChange("completed")}>Completed</button>
-                  <button onClick={() => handleFilterChange("past due")}>Past Due</button>
-                  <button style={{ marginLeft: 8 }} onClick={() => window.location.reload()}>Refresh</button>
-                </div>
+          <div className="dashboard-lower-half">
+            <div className="assignments-section">
+              <h3>Assignments</h3>
+              <div className="progress-circle">
+                <svg viewBox="0 0 36 36">
+                  <path
+                    className="circle-bg"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#e6e6e6"
+                    strokeWidth="3.8"
+                  />
+                  <path
+                    className="circle"
+                    strokeDasharray={`${submissionProgress}, 100`}
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#86c26f"
+                    strokeWidth="3.8"
+                  />
+                </svg>
+                <div className="progress-text">{submissionProgress}% Progress</div>
               </div>
-
               <div className="scrollable-content">
-                {filteredAssignments.length > 0 ? (
-                  <ul>
-                    {filteredAssignments.map(a => {
-                      const sub = getSubmission(a.id);
-                      const done = hasSubmitted(a.id);
-                      return (
-                        <li key={a.id}>
+                {assignments.length > 0 ? (
+                  assignments.map((a) => {
+                    const isDueToday = new Date(a.dueDate).toDateString() === new Date().toDateString();
+                    const submitted = hasSubmitted(a.id);
+                    return (
+                      <div className="assignment-card" key={a.id}>
+                        <div className="assignment-header">
+                          <span className="assignment-icon">{submitted ? "✅" : "❗"}</span>
                           <strong>{a.title}</strong>
-                          <p>Submission Status: {sub?.status ?? "Not submitted"}</p>
-                          {done ? (
-                            <>
-                              <button onClick={() => null}>Undo Turn‑In</button>
-                              <p>
-                                View File:{" "}
-                                <a
-                                  href={`${API_URL}/uploads/${sub.filePath.split("\\").pop()}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                >
-                                  {sub.filePath.split("\\").pop()}
-                                </a>
-                              </p>
-                            </>
-                          ) : (
-                            <>
-                              <input
-                                type="file"
-                                onChange={(e) => handleFileChange(e, a.id)}
-                              />
-                              <button onClick={() => handleSubmitAssignment(a.id)}>
-                                Submit
-                              </button>
-                            </>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
+                          <span className="due-date">
+                            {isDueToday ? "due today" : `due ${new Date(a.dueDate).toLocaleDateString()}`}
+                          </span>
+                        </div>
+                        <ul>
+                          {a.requirements?.split(",").map((r, i) => (
+                            <li key={i} className={submitted ? "req-complete" : "req-pending"}>
+                              {r.trim()}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })
                 ) : (
                   <p>No assignments available.</p>
                 )}
@@ -248,9 +139,7 @@ const ScholarDashboard = () => {
             </div>
 
             <div className="scholar-announcement">
-              <div className="section-header">
-                <h3>Announcements</h3>
-              </div>
+              <h3>Announcements</h3>
               <div className="scrollable-content">
                 {announcements.length > 0 ? (
                   <ul>
@@ -283,10 +172,9 @@ const ScholarDashboard = () => {
               </div>
             </div>
           </div>
-        </div>
 
-        {message && <p className="info-message">{message}</p>}
-        {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message">{error}</p>}
+        </div>
       </div>
     </div>
   );

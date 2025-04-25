@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from "../assets/IskoLAIR_Logo.png";
 import AssignmentApi from "../services/AssignmentApi";
 import { getSubmissionsByAssignment, verifySubmission } from "../services/SubmissionApi";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 import "../pages/css/Announcement.css";
 import "../pages/css/Assignment.css";
+
+import StaffHeader from '../components/StaffHeader';
+import StaffNavbar from '../components/StaffNavbar';
 
 const Assignment = () => {
   const [assignments, setAssignments] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -28,7 +33,7 @@ const Assignment = () => {
       }
     }
     loadAssignments();
-  }, []);
+  }, []); 
 
   const handleViewSubmissions = async assignmentId => {
     try {
@@ -78,40 +83,51 @@ const Assignment = () => {
     }
   };
 
+  const handleDownloadExcel = () => {
+    if (!selectedAssignment) {
+      setError("Please select an assignment first.");
+      return;
+    }
+
+    const dataToExport = submissions.map((s) => ({
+      Scholar: s.scholar ? `${s.scholar.firstName} ${s.scholar.lastName}` : "N/A",
+      Status: s.status,
+      "Submitted At": s.submittedAt
+        ? new Date(s.submittedAt).toLocaleString()
+        : "N/A",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Submissions");
+
+    const blob = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    saveAs(
+      new Blob([blob], { type: "application/octet-stream" }),
+      `${selectedAssignment.title.replace(/ /g, "_")}_Submissions.xlsx`
+    );
+  };
+
   return (
     <div className="assignment-page">
-      {/* Header */}
-      <div className="staff-header">
-        <img src={logo} alt="IskoLAIR Logo" className="logo" />
-        <img
-          src="https://via.placeholder.com/40"
-          alt="Profile"
-          className="profile-pic"
-          onClick={() => navigate("/staff/profile")}
-        />
-      </div>
+      <StaffHeader />
+      <div className="staff-dashboard">
+        <StaffNavbar />
 
-      {/* Sidebar */}
-      <div className="announcement-container">
-        <div className="Navigationbar">
-          <button className={location.pathname === "/staff/dashboard" ? "active" : ""} onClick={() => navigate("/staff/dashboard")}>Home</button>
-          <button className={location.pathname === "/announcements" ? "active" : ""} onClick={() => navigate("/announcements")}>Announcements</button>
-          <button className={location.pathname === "/assignments" ? "active" : ""} onClick={() => navigate("/assignments")}>Assignments</button>
-          <button className={location.pathname === "/messages" ? "active" : ""} onClick={() => navigate("/messages")}>Messages</button>
-          <button className={location.pathname === "/resources" ? "active" : ""} onClick={() => navigate("/resources")}>Resources</button>
-        </div>
+        <div className="assignment-wrapper">
+          <div className='assignment-container'>
+            <div className='assignment-header'>
+              <h1>Assignments</h1>
+              <button onClick={() => navigate("/assignments/create")}>+ Create Assignment</button>
+            </div>
 
-        {/* Main Content */}
-        <div className="announcement-content">
-          <div className="CreateAnnouncement-A">
-            <button onClick={() => navigate("/assignments/create")}>Create Assignment</button>
-          </div>
+            {error && <p className="error-message">{error}</p>}
+            {message && <p className="success-message">{message}</p>}
 
-          {error && <p className="error-message">{error}</p>}
-          {message && <p className="success-message">{message}</p>}
-
-          {/* Assignments */}
-          <div className="panel assignment-list-panel">
             {assignments.map(a => (
               <div key={a.id} className="assignment-card">
                 <div>
@@ -119,71 +135,81 @@ const Assignment = () => {
                   <p><strong>Due:</strong> {a.dueDate}</p>
                 </div>
                 <div className="assignment-actions">
-                  <button onClick={() => handleViewSubmissions(a.id)}>View Submissions</button>
-                  <button onClick={() => handleDeleteAssignment(a.id)}>Delete</button>
+                  <button className="view" onClick={() => {
+                    setSelectedAssignment(a);
+                    handleViewSubmissions(a.id);
+                  }}>View</button>
+                  <button className="delete" onClick={() => handleDeleteAssignment(a.id)}>Delete</button>
                 </div>
               </div>
             ))}
             {assignments.length === 0 && <p>No assignments found.</p>}
-          </div>
 
-          {/* Submissions */}
-          {submissions.length > 0 && (
-            <section className="panel submissions-panel">
-              <h2>Submissions</h2>
-              <div className="filter-buttons">
-                {["all", "verified", "unverified"].map(s => (
-                  <button key={s} onClick={() => handleFilterChange(s)} className={filter === s ? "active" : ""}>
-                    {s.charAt(0).toUpperCase() + s.slice(1)}
+            {submissions.length > 0 && (
+              <section className="panel submissions-panel">
+                <h2>Submissions</h2>
+                <div className="filter-buttons">
+                  {["all", "verified", "unverified", "unsubmitted"].map(s => (
+                    <button key={s} onClick={() => handleFilterChange(s)} className={filter === s ? "active" : ""}>
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    </button>
+                  ))}
+                  <button className="download-excel" onClick={handleDownloadExcel}>
+                    📥 Download Excel
                   </button>
-                ))}
-              </div>
+                </div>
 
-              <ul className="submission-list">
-                {filteredSubmissions.map(s => (
-                  <li key={s.id} className="submission-item">
-                    <div>
-                      <p><strong>Scholar:</strong> {s.scholar ? `${s.scholar.firstName} ${s.scholar.lastName}` : "N/A"}</p>
-                      <p><strong>Status:</strong> {s.status}</p>
-                    </div>
-                    <div className="submission-actions">
-                      <button onClick={() => setSelectedSubmission(s)}>View Details</button>
-                      {s.status === "unverified" && (
-                        <button onClick={() => handleVerifySubmission(s.id)}>Verify</button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+                <ul className="submission-list">
+                  {filteredSubmissions.map(s => (
+                    <li key={s.id} className="submission-item">
+                      <div>
+                        <p><strong>Scholar:</strong> {s.scholar ? `${s.scholar.firstName} ${s.scholar.lastName}` : "N/A"}</p>
+                        <p><strong>Status:</strong> {s.status}</p>
+                      </div>
+                      <div className="submission-actions">
+                        <button onClick={() => setSelectedSubmission(s)}>View Details</button>
+                        {s.status === "unverified" && (
+                          <button onClick={() => handleVerifySubmission(s.id)}>Verify</button>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-          {/* Submission Details */}
-          {selectedSubmission && (
-            <section className="panel details-panel">
-              <h2>Submission Details</h2>
-              <p><strong>Scholar:</strong> {selectedSubmission.scholar ? `${selectedSubmission.scholar.firstName} ${selectedSubmission.scholar.lastName}` : "N/A"}</p>
-              <p><strong>Status:</strong> {selectedSubmission.status}</p>
-              <p>
-                <strong>Submitted On:</strong>{" "}
-                {selectedSubmission.submittedAt
-                  ? new Date(selectedSubmission.submittedAt).toLocaleString()
-                  : "N/A"}
-              </p>
-              <p>
-                <strong>File:</strong>{" "}
-                <a
-                  href={`${API_URL}/uploads/${selectedSubmission.filePath.split("\\").pop()}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                >
-                  {selectedSubmission.filePath.split("\\").pop()}
-                </a>
-              </p>
-              <button className="btn-secondary" onClick={() => setSelectedSubmission(null)}>Close</button>
-            </section>
-          )}
+            {selectedSubmission && (
+              <section className="panel details-panel">
+                <h2>Submission Details</h2>
+                <p><strong>Scholar:</strong> {selectedSubmission.scholar ? `${selectedSubmission.scholar.firstName} ${selectedSubmission.scholar.lastName}` : "N/A"}</p>
+                <p><strong>Status:</strong> {selectedSubmission.status}</p>
+                <p>
+                  <strong>Submitted On:</strong>{" "}
+                  {selectedSubmission.submittedAt
+                    ? new Date(selectedSubmission.submittedAt).toLocaleString()
+                    : "N/A"}
+                </p>
+                <p>
+                  <strong>Files:</strong>
+                  <ul>
+                    {selectedSubmission.filePath.split(",").map((file, idx) => (
+                      <li key={idx}>
+                        <a
+                          href={`${API_URL}/uploads/${file.trim().split("\\").pop()}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                        >
+                          {file.trim().split("\\").pop()}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </p>
+                <button className="btn-secondary" onClick={() => setSelectedSubmission(null)}>Close</button>
+              </section>
+            )}
+          </div>
         </div>
       </div>
     </div>

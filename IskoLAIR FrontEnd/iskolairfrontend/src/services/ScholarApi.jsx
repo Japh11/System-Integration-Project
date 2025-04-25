@@ -110,6 +110,50 @@ const ScholarApi = {
             throw new Error("Failed to fetch assignments for scholar");
         }
     },
+    uploadProfilePicture: async (id, file) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                throw new Error("Unauthorized: No token found");
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await axios.post(`${API_URL}/scholars/${id}/upload-profile-picture`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            console.log("✅ Profile Picture Upload Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("❌ Error Uploading Profile Picture:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.error || "Failed to upload profile picture");
+        }
+    },
+    getProfilePicture: async (id) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                throw new Error("Unauthorized: No token found");
+            }
+
+            const response = await axios.get(`${API_URL}/scholars/${id}/profile-picture`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            console.log("✅ Fetched Profile Picture URL:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("❌ Error Fetching Profile Picture:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.error || "Failed to fetch profile picture");
+        }
+    },
 };
 
 export default ScholarApi;

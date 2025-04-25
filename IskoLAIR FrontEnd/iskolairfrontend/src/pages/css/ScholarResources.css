@@ -1,49 +1,64 @@
-.scholar-resources-page .scholar-dashboard-content {
-  padding: 20px;
+/* Reset */
+.scholar-resources-page * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
 }
 
+/* Page Wrapper */
+.scholar-resources-page {
+  width: 100%;
+  padding: 30px 60px;
+  background-color: #f5f7fb;
+  min-height: 100vh;
+}
+
+/* Header */
+.scholar-resources-header h2 {
+  font-size: 26px;
+  color: #334f7d;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Scrollable Area */
 .resources-scrollable {
   max-height: 60vh;
   overflow-y: auto;
   padding-right: 10px;
-
-  /* 🔁 Relative border radius that adjusts with height/width */
-  border-radius: 2%;
-
-  /* Optional styling */
-  background: #f8f8f8;
-  border: 1px solid #ddd;
+  border-radius: 10px;
 }
 
-/* No default list style */
+/* List Reset */
 .resources-scrollable ul {
   list-style: none;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-  border: none !important;
+  padding: 0;
+  margin: 0;
 }
 
+/* Card */
 .resource-card {
   padding: 20px;
   margin-bottom: 16px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  border: none; /* 👈 removes any unwanted borders */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
 }
-
 .resource-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
+/* Author Text */
 .resources-author {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   color: #334f7d;
   margin-bottom: 4px;
 }
 
+/* Title */
 .resource-title {
   font-size: 18px;
   font-weight: 600;
@@ -51,6 +66,7 @@
   margin-bottom: 12px;
 }
 
+/* File Wrapper */
 .resource-file-wrapper {
   display: flex;
   align-items: center;
@@ -61,11 +77,13 @@
   border: 1px solid #ddd;
 }
 
+/* File Icon */
 .resource-icon {
   font-size: 28px;
   color: #334f7d;
 }
 
+/* Filename */
 .resource-filename {
   flex-grow: 1;
   font-size: 15px;
@@ -75,31 +93,27 @@
   text-overflow: ellipsis;
 }
 
+/* Download Button */
 .resource-download a {
   text-decoration: none;
   color: #334f7d;
   transition: transform 0.2s ease;
 }
-
 .resource-download a:hover {
   color: #1d3557;
   transform: scale(1.1);
 }
 
+/* Image Preview */
 .resource-image {
   width: 40px;
   height: 40px;
   border-radius: 5px;
   object-fit: cover;
 }
-.scholar-first-half {
-  width: 160vh;
-  height: 25vh;
-  margin: 0 auto;
-  margin-left: 50px;
-  margin-top: 20px;
+
+/* Error Message */
+.error-message {
+  color: red;
   margin-bottom: 10px;
-  border-radius: 0;
-  border: none; /* <-- THIS causes the gray box */
-  padding: 20px;
 }
