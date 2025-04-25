@@ -16,7 +16,6 @@ const ScholarAssignment = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
     fetchScholarData();
@@ -76,7 +75,7 @@ const ScholarAssignment = () => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/api/submissions/submit/${assignmentId}/${scholarId}`,
+        `http://localhost:8080/api/submissions/submit/${assignmentId}/${scholarId}`,
         formData,
         {
           headers: {
@@ -141,24 +140,24 @@ const ScholarAssignment = () => {
                         <p><strong>Due:</strong> {a.dueDate}</p>
                         <p><strong>Status:</strong> {sub ? sub.status : "Not submitted"}</p>
                         {sub?.filePath && (
-                          <p>
-                            <strong>Files:</strong>
-                            <ul>
-                              {sub.filePath.split(",").map((file, idx) => (
-                                <li key={idx}>
-                                  <a
-                                    href={`${API_URL}/uploads/${file.trim().split("\\").pop()}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    download
-                                  >
-                                    {file.trim().split("\\").pop()}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          </p>
-                        )}
+                            <div>
+                              <p><strong>Files:</strong></p>
+                              <ul>
+                                {sub.filePath.split(",").map((file, idx) => (
+                                  <li key={idx}>
+                                    <a
+                                      href={`http://localhost:8080/uploads/${file.trim().split("\\").pop()}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download
+                                    >
+                                      {file.trim().split("\\").pop()}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                       </div>
                       {submitted ? (
                         sub.status !== "verified" && (

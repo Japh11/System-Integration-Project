@@ -47,13 +47,32 @@ const ScholarList = () => {
 
   const handleUpdateScholar = async (e) => {
     e.preventDefault();
+
+    const isEditing = !!selectedScholar.id;
+    const isAtFinalStep = (isEditing && currentStep === 3) || (!isEditing && currentStep === 4);
+
+    if (!isAtFinalStep) return;
+
     try {
-      await ScholarApi.updateScholar(selectedScholar.id, selectedScholar);
-      setMessage("Scholar updated successfully!");
+      const updatedScholar = { ...selectedScholar };
+
+      if (updatedScholar.id) {
+        delete updatedScholar.password;
+      }
+
+      if (updatedScholar.id) {
+        await ScholarApi.updateScholar(updatedScholar.id, updatedScholar);
+        setMessage("✅ Scholar updated!");
+      } else {
+        await ScholarApi.registerScholar(updatedScholar);
+        setMessage("✅ Scholar created!");
+      }
+
       setSelectedScholar(null);
       fetchScholars();
     } catch (err) {
-      console.error("Update error:", err);
+      console.error("❌ Update error:", err);
+      setMessage("❌ Failed to save scholar");
     }
   };
 
@@ -122,109 +141,87 @@ const ScholarList = () => {
         </table>
 
         {selectedScholar && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <span className="close" onClick={() => setSelectedScholar(null)}>&times;</span>
-      <h2>Edit Scholar</h2>
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <span className="close" onClick={() => setSelectedScholar(null)}>&times;</span>
+              <h2>Edit Scholar</h2>
+              {message && <p className="success-message">{message}</p>}
 
-      {/* Step Indicator */}
-      <div className="step-indicator">
-        {[1, 2, 3].map((step) => (
-          <React.Fragment key={step}>
-            <div className={`circle ${currentStep === step ? "active" : ""}`}>{step}</div>
-            {step < 3 && <div className={`line ${currentStep > step ? "active" : ""}`}></div>}
-          </React.Fragment>
-        ))}
-      </div>
+              <div className="step-indicator">
+                {[1, 2, 3].map((step) => (
+                  <React.Fragment key={step}>
+                    <div className={`circle ${currentStep === step ? "active" : ""}`}>{step}</div>
+                    {step < 3 && <div className={`line ${currentStep > step ? "active" : ""}`}></div>}
+                  </React.Fragment>
+                ))}
+              </div>
 
-      <form onSubmit={handleUpdateScholar} className="create-form">
-        {currentStep === 1 && (
-          <>
-            <h3 className="step-title">Personal Details</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label>First Name</label>
-                <input name="firstName" value={selectedScholar.firstName} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input name="lastName" value={selectedScholar.lastName} onChange={handleChange} required />
-              </div>
+              <form onSubmit={handleUpdateScholar} className="create-form">
+                {currentStep === 1 && (
+                  <>
+                    <h3 className="step-title">Personal Details</h3>
+                    <div className="form-row">
+                      <div className="form-group"><label>First Name</label><input name="firstName" value={selectedScholar.firstName} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Last Name</label><input name="lastName" value={selectedScholar.lastName} onChange={handleChange} required /></div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group"><label>Middle Name</label><input name="middleName" value={selectedScholar.middleName} onChange={handleChange} /></div>
+                      <div className="form-group"><label>Sex</label><input name="sex" value={selectedScholar.sex} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Birthday</label><input type="date" name="birthday" value={selectedScholar.birthday} onChange={handleChange} required /></div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group"><label>Contact Number</label><input name="contactNumber" value={selectedScholar.contactNumber} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Email</label><input type="email" name="email" value={selectedScholar.email} onChange={handleChange} required /></div>
+                    </div>
+                  </>
+                )}
+
+                {currentStep === 2 && (
+                  <>
+                    <h3 className="step-title">Address</h3>
+                    <div className="form-row">
+                      <div className="form-group"><label>Barangay</label><input name="brgy" value={selectedScholar.brgy} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Municipality</label><input name="municipality" value={selectedScholar.municipality} onChange={handleChange} required /></div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group"><label>Province</label><input name="province" value={selectedScholar.province} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>District</label><input name="district" value={selectedScholar.district} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Region</label><input name="region" value={selectedScholar.region} onChange={handleChange} required /></div>
+                    </div>
+                  </>
+                )}
+
+                {currentStep === 3 && (
+                  <>
+                    <h3 className="step-title">Academic Info</h3>
+                    <div className="form-row">
+                      <div className="form-group"><label>Batch Year</label><input name="batchYear" value={selectedScholar.batchYear} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Account No</label><input name="accountNo" value={selectedScholar.accountNo} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Spas No</label><input name="spasNo" value={selectedScholar.spasNo} onChange={handleChange} required /></div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group"><label>Level Year</label><input name="levelYear" value={selectedScholar.levelYear} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>School</label><input name="school" value={selectedScholar.school} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Course</label><input name="course" value={selectedScholar.course} onChange={handleChange} required /></div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group"><label>Status</label><input name="status" value={selectedScholar.status} onChange={handleChange} required /></div>
+                      <div className="form-group"><label>Type of Scholarship</label><input name="typeOfScholarship" value={selectedScholar.typeOfScholarship} onChange={handleChange} required /></div>
+                    </div>
+                  </>
+                )}
+
+                <div className="step-navigation">
+                  {currentStep > 1 && <button type="button" onClick={() => setCurrentStep(currentStep - 1)}>Back</button>}
+                  {currentStep < 3 && <button type="button" onClick={() => setCurrentStep(currentStep + 1)}>Next</button>}
+                  {currentStep === 3 && (
+                    <button type="submit" className="submit-button">Update Scholar</button>
+                  )}
+                </div>
+              </form>
             </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Middle Name</label>
-                <input name="middleName" value={selectedScholar.middleName} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label>Sex</label>
-                <input name="sex" value={selectedScholar.sex} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>Birthday</label>
-                <input type="date" name="birthday" value={selectedScholar.birthday} onChange={handleChange} required />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Contact Number</label>
-                <input name="contactNumber" value={selectedScholar.contactNumber} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" name="email" value={selectedScholar.email} onChange={handleChange} required />
-              </div>
-            </div>
-          </>
+          </div>
         )}
-
-        {currentStep === 2 && (
-          <>
-            <h3 className="step-title">Address</h3>
-            <div className="form-row">
-              <div className="form-group"><label>Barangay</label><input name="brgy" value={selectedScholar.brgy} onChange={handleChange} required /></div>
-              <div className="form-group"><label>Municipality</label><input name="municipality" value={selectedScholar.municipality} onChange={handleChange} required /></div>
-            </div>
-            <div className="form-row">
-              <div className="form-group"><label>Province</label><input name="province" value={selectedScholar.province} onChange={handleChange} required /></div>
-              <div className="form-group"><label>District</label><input name="district" value={selectedScholar.district} onChange={handleChange} required /></div>
-              <div className="form-group"><label>Region</label><input name="region" value={selectedScholar.region} onChange={handleChange} required /></div>
-            </div>
-          </>
-        )}
-
-        {currentStep === 3 && (
-          <>
-            <h3 className="step-title">Academic Info</h3>
-            <div className="form-row">
-              <div className="form-group"><label>Batch Year</label><input name="batchYear" value={selectedScholar.batchYear} onChange={handleChange} required /></div>
-              <div className="form-group"><label>Account No</label><input name="accountNo" value={selectedScholar.accountNo} onChange={handleChange} required /></div>
-              <div className="form-group"><label>Spas No</label><input name="spasNo" value={selectedScholar.spasNo} onChange={handleChange} required /></div>
-            </div>
-            <div className="form-row">
-              <div className="form-group"><label>Level Year</label><input name="levelYear" value={selectedScholar.levelYear} onChange={handleChange} required /></div>
-              <div className="form-group"><label>School</label><input name="school" value={selectedScholar.school} onChange={handleChange} required /></div>
-            </div>
-            <div className="form-row">
-              <div className="form-group"><label>Course</label><input name="course" value={selectedScholar.course} onChange={handleChange} required /></div>
-              <div className="form-group"><label>Status</label><input name="status" value={selectedScholar.status} onChange={handleChange} required /></div>
-              <div className="form-group"><label>Type of Scholarship</label><input name="typeOfScholarship" value={selectedScholar.typeOfScholarship} onChange={handleChange} required /></div>
-            </div>
-          </>
-        )}
-
-        <div className="step-navigation">
-          {currentStep > 1 && <button type="button" onClick={() => setCurrentStep(currentStep - 1)}>Back</button>}
-          {currentStep < 3 ? (
-            <button type="button" onClick={() => setCurrentStep(currentStep + 1)}>Next</button>
-          ) : (
-            <button type="submit" className="submit-button">Save</button>
-          )}
-        </div>
-      </form>
-    </div>
-  </div>
-)}
       </div>
     </div>
   );

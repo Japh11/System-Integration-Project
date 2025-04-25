@@ -92,31 +92,35 @@ const AdminDashboard = () => {
 
   const handleSaveScholar = async (e) => {
     e.preventDefault();
+  
+    const isEditing = !!scholarForm.id;
+    const isAtFinalStep = (isEditing && currentStep === 3) || (!isEditing && currentStep === 4);
+  
+    if (!isAtFinalStep) return;
+  
     try {
-        const updatedScholar = { ...scholarForm };
-
-        // Exclude the password field if updating an existing scholar
-        if (scholarForm.id && !scholarForm.password) {
-            delete updatedScholar.password;
-        }
-
-        if (scholarForm.id) {
-            // Update existing scholar
-            await ScholarApi.updateScholar(scholarForm.id, updatedScholar);
-            setMessage("✅ Scholar updated!");
-        } else {
-            // Create new scholar
-            await ScholarApi.registerScholar(updatedScholar);
-            setMessage("✅ Scholar created!");
-        }
-
-        setShowScholarForm(false);
-        fetchScholars();
+      const updatedScholar = { ...scholarForm };
+  
+      if (scholarForm.id) {
+        delete updatedScholar.password;
+      }
+  
+      if (scholarForm.id) {
+        await ScholarApi.updateScholar(scholarForm.id, updatedScholar);
+        setMessage("✅ Scholar updated!");
+      } else {
+        await ScholarApi.registerScholar(updatedScholar);
+        setMessage("✅ Scholar created!");
+      }
+  
+      setShowScholarForm(false);
+      fetchScholars();
     } catch (err) {
-        console.error(err);
-        setMessage("❌ Save failed");
+      console.error(err);
+      setMessage("❌ Save failed");
     }
-};
+  };
+  
 
   const handleArchiveScholar = async id => {
     if (!window.confirm("Archive this scholar?")) return;
@@ -367,35 +371,50 @@ const AdminDashboard = () => {
                 </>
               )}
 
-                {currentStep === 4 && (
-                  <>
-                    <h3 className="step-title">Security Info</h3>
-                    {!scholarForm.id && (
-                      <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" value={scholarForm.password} onChange={handleScholarChange} required />
-                      </div>
-                    )}
-                  </>
-                )}
+              {currentStep === 4 && !scholarForm.id && (
+                <>
+                  <h3 className="step-title">Security Info</h3>
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={scholarForm.password}
+                      onChange={handleScholarChange}
+                      required
+                    />
+                  </div>
+                </>
+              )}
 
-              {/* Step Navigation */}
-             <div className="step-navigation">
-                {currentStep > 1 && (
-                  <button type="button" onClick={() => setCurrentStep(currentStep - 1)}>
-                    Back
-                  </button>
-                )}
-                {currentStep < 4 ? (
-                  <button type="button" onClick={() => setCurrentStep(currentStep + 1)}>
-                    Next
-                  </button>
-                ) : (
-                  <button type="submit" className="submit-button">
-                    {scholarForm.id ? "Update Scholar" : "Create Scholar"}
-                  </button>
-                )}
-              </div>
+
+            <div className="step-navigation">
+              {currentStep > 1 && (
+                <button type="button" onClick={() => setCurrentStep(currentStep - 1)}>
+                  Back
+                </button>
+              )}
+
+              {!scholarForm.id && currentStep < 4 && (
+                <button type="button" onClick={() => setCurrentStep(currentStep + 1)}>
+                  Next
+                </button>
+              )}
+
+              {scholarForm.id && currentStep < 3 && (
+                <button type="button" onClick={() => setCurrentStep(currentStep + 1)}>
+                  Next
+                </button>
+              )}
+
+              {(currentStep === 4 && !scholarForm.id) || (currentStep === 3 && scholarForm.id) ? (
+                <button type="submit" className="submit-button">
+                  {scholarForm.id ? "Update Scholar" : "Create Scholar"}
+                </button>
+              ) : null}
+            </div>
+
+
             </form>
           </div>
         </div>

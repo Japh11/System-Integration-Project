@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AssignmentApi from "../services/AssignmentApi";
 import { getSubmissionsByAssignment, verifySubmission } from "../services/SubmissionApi";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 import "../pages/css/Announcement.css";
@@ -21,7 +21,6 @@ const Assignment = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
     async function loadAssignments() {
@@ -89,27 +88,35 @@ const Assignment = () => {
       return;
     }
 
-    const dataToExport = submissions.map((s) => ({
-      Scholar: s.scholar ? `${s.scholar.firstName} ${s.scholar.lastName}` : "N/A",
-      Status: s.status,
-      "Submitted At": s.submittedAt
-        ? new Date(s.submittedAt).toLocaleString()
-        : "N/A",
-    }));
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Submissions");
 
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Submissions");
+    // Add headers
+    worksheet.columns = [
+      { header: "Scholar", key: "scholar", width: 30 },
+      { header: "Status", key: "status", width: 15 },
+      { header: "Submitted At", key: "submittedAt", width: 25 },
+    ];
 
-    const blob = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
+    // Add data rows
+    submissions.forEach((s) => {
+      worksheet.addRow({
+        scholar: s.scholar ? `${s.scholar.firstName} ${s.scholar.lastName}` : "N/A",
+        status: s.status,
+        submittedAt: s.submittedAt
+          ? new Date(s.submittedAt).toLocaleString()
+          : "N/A",
+      });
     });
 
-    saveAs(
-      new Blob([blob], { type: "application/octet-stream" }),
-      `${selectedAssignment.title.replace(/ /g, "_")}_Submissions.xlsx`
-    );
+    // Write the workbook to a Blob and trigger download
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      saveAs(blob, `${selectedAssignment.title.replace(/ /g, "_")}_Submissions.xlsx`);
+    }).catch((err) => {
+      console.error("Error generating Excel file:", err);
+      setError("Failed to generate Excel file.");
+    });
   };
 
   return (
@@ -195,7 +202,7 @@ const Assignment = () => {
                     {selectedSubmission.filePath.split(",").map((file, idx) => (
                       <li key={idx}>
                         <a
-                          href={`${API_URL}/uploads/${file.trim().split("\\").pop()}`}
+                          href={`http://localhost:8080/uploads/${file.trim().split("\\").pop()}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           download
