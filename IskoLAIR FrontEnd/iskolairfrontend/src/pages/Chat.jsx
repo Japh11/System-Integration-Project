@@ -23,6 +23,7 @@ const Chat = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
 
   useEffect(() => {
     const role = localStorage.getItem("role");
@@ -74,7 +75,7 @@ const Chat = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8080/api/contacts?userId=${userId}&role=ROLE_${role}`,
+        `${API_URL}/api/contacts?userId=${userId}&role=ROLE_${role}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -86,7 +87,7 @@ const Chat = () => {
           try {
             console.log(`Fetching profile picture for role: ${contact.role}, id: ${contact.id}`);
             const profilePictureResponse = await axios.get(
-              `http://localhost:8080/api/${contact.role.toLowerCase()}/${contact.id}/profile-picture`,
+              `${API_URL}/api/${contact.role.toLowerCase()}/${contact.id}/profile-picture`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               }
@@ -110,7 +111,7 @@ const Chat = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8080/api/messages?senderId=${senderId}&senderRole=${senderRole}&recipientId=${recipientId}&recipientRole=${recipientRole}`,
+        `${API_URL}/api/messages?senderId=${senderId}&senderRole=${senderRole}&recipientId=${recipientId}&recipientRole=${recipientRole}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
