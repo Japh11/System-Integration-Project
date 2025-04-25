@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ResourcesApi from "../services/ResourcesApi";
 import logo from "../assets/IskoLAIR_Logo.png";
-import "../pages/css/ScholarDashboard.css"; // 👈 reuse the dashboard layout
-import "../pages/css/Resources.css";
+import "../pages/css/ScholarResources.css"; // 👈 specific styles for resources
+import GetAppIcon from '@mui/icons-material/GetApp';
+
+import ScholarHeader from "../components/ScholarHeader";
+import ScholarNavbar from "../components/ScholarNavbar";
 
 const ScholarResources = () => {
   const [resources, setResources] = useState([]);
@@ -19,57 +22,47 @@ const ScholarResources = () => {
   return (
     <div>
       {/* --- Header --- */}
-      <div className="scholar-header">
-        <img src={logo} alt="IskoLAIR Logo" className="logo" />
-        <img
-          src="https://via.placeholder.com/40"
-          alt="Profile"
-          style={{ width: 40, height: 40, cursor: "pointer" }}
-          onClick={() => navigate("/scholar/profile")}
-        />
-      </div>
-
-      <div className="scholar-dashboard">
-        {/* --- Sidebar Nav --- */}
-        <div className="scholar-navigationbar">
-          <button onClick={() => navigate("/scholar/dashboard")}>Home</button>
-          <button onClick={() => navigate("/scholar/announcements")}>Announcements</button>
-          <button onClick={() => navigate("/scholar/assignments")}>Assignments</button>
-          <button onClick={() => navigate("/scholar/resources")}>Resources</button>
-          <button onClick={() => navigate("/scholar/aboutus")}>About Us</button>
-          <button onClick={() => navigate("/Smessages")}>Chat</button>
-        </div>
+      <ScholarHeader />
+        <div className="chat-body">
+          <ScholarNavbar />
 
         {/* --- Content Area --- */}
-        <div className="scholar-dashboard-content">
-          <div className="scholar-first-half">
+        <div className="scholar-resources-page">
+          <div className="scholar-resources">
             <h2>Resources</h2>
             {error && <p className="error-message">{error}</p>}
             <div className="resources-scrollable">
-              <ul>
-                {resources.map(r => (
-                  <li key={r.id} className="resources-page-box">
-                    <h3>{r.title}</h3>
-                    <div>
-                      {r.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                        <img
-                          src={r.fileUrl}
-                          alt={r.title}
-                          style={{ width: "200px", height: "auto" }}
-                        />
-                      ) : (
-                        <a
-                          href={r.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Download File
-                        </a>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <ul>
+            {resources.map(r => (
+              <div className="resource-card">
+              <h3 className="resources-author">IskoLAIR</h3>
+              <h2 className="resource-title">{r.title}</h2>
+            
+              <div className="resource-file-wrapper">
+                {r.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                  <img
+                    src={r.fileUrl}
+                    alt={r.title}
+                    className="resource-image"
+                  />
+                ) : (
+                  <div className="resource-icon">📄</div>
+                )}
+            
+                <div className="resource-filename">
+                  {decodeURIComponent(r.fileUrl.split("/").pop())}
+                </div>
+            
+                <div className="resource-download">
+                  <a href={r.fileUrl} download target="_blank" rel="noopener noreferrer" title="Download file">
+                    <GetAppIcon sx={{ fontSize: 28, color: "#334f7d", transform: "rotate(0deg)" }} />
+                  </a>
+                </div>
+              </div>
+            </div>
+            ))}
+          </ul>
+
             </div>
           </div>
         </div>
