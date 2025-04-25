@@ -62,7 +62,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- ✅ Single version of jjwt -->
+        <!-- ✅ JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -112,6 +112,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
+        </dependency>
+
+        <!-- 🆕 Logback manually added to fix ThrowableProxy crash -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.14</version>
         </dependency>
     </dependencies>
 

@@ -24,14 +24,15 @@ public class ScholarPasswordResetController {
 
     @GetMapping("/change-password")
     public void validateToken(@RequestParam String token, HttpServletResponse response) throws IOException {
-        if (passwordResetService.validatePasswordResetToken(token)) {
-            String resetPageUrl = "http://localhost:5173/reset-password?token=" + token; 
-            response.sendRedirect(resetPageUrl);
+        // Use the service method to handle token validation and URL creation
+        String resetPageUrl = passwordResetService.createPasswordResetLink(token);
+
+        if (resetPageUrl != null) {
+            response.sendRedirect(resetPageUrl);  // Redirect to the frontend reset page
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or expired token!");
         }
     }
-
     @PostMapping(value = "/save-password", consumes = "application/x-www-form-urlencoded")
     public ResponseEntity<String> resetPassword(
             @RequestParam("token") String token,

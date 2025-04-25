@@ -23,39 +23,29 @@ import com.Capstone.IskoLAIR.Repository.StaffRepository;
 @Component
 public class AuthChannelInterceptorAdapter implements ChannelInterceptor {
 
-    @Autowired
-    private JWTUtil jwtUtil;
-
-    @Autowired
-    private AdminRepository adminRepo;
-
-    @Autowired
-    private ScholarRepository scholarRepo;
-
-    @Autowired
-    private StaffRepository staffRepo;
+    @Autowired private JWTUtil jwtUtil;
+    @Autowired private AdminRepository adminRepo;
+    @Autowired private ScholarRepository scholarRepo;
+    @Autowired private StaffRepository staffRepo;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        // ✅ Allow preflight SockJS /info requests and heartbeat frames
+        if (accessor == null || accessor.getCommand() == null) {
+            return message;
+        }
+
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");
 
-            System.out.println("🔐 WebSocket CONNECT Attempt...");
-            System.out.println("🪪 Raw Authorization Header: " + token);
-
             if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7); // remove "Bearer "
-                System.out.println("🔑 JWT after stripping 'Bearer': " + token);
+                token = token.substring(7); // strip "Bearer "
 
                 try {
                     String email = jwtUtil.validateTokenAndRetrieveSubject(token);
                     String role = jwtUtil.validateTokenAndRetrieveRole(token);
-
-                    System.out.println("✅ Token Validated");
-                    System.out.println("📧 Email: " + email);
-                    System.out.println("🛡️ Role: " + role);
 
                     UserDetails userDetails = null;
                     var authorities = List.of(new SimpleGrantedAuthority(role));
@@ -63,41 +53,32 @@ public class AuthChannelInterceptorAdapter implements ChannelInterceptor {
                     switch (role) {
                         case "ROLE_ADMIN":
                             userDetails = adminRepo.findByEmail(email)
-                                .map(a -> new User(a.getEmail(), a.getPassword(), authorities))
-                                .orElse(null);
+                                    .map(a -> new User(a.getEmail(), a.getPassword(), authorities))
+                                    .orElse(null);
                             break;
-
                         case "ROLE_STAFF":
                             userDetails = staffRepo.findByEmail(email)
-                                .map(s -> new User(s.getEmail(), s.getPassword(), authorities))
-                                .orElse(null);
+                                    .map(s -> new User(s.getEmail(), s.getPassword(), authorities))
+                                    .orElse(null);
                             break;
-
                         case "ROLE_SCHOLAR":
                             userDetails = scholarRepo.findByEmail(email)
-                                .map(s -> new User(s.getEmail(), s.getPassword(), authorities))
-                                .orElse(null);
+                                    .map(s -> new User(s.getEmail(), s.getPassword(), authorities))
+                                    .orElse(null);
                             break;
-
-                        default:
-                            System.out.println("❌ Unrecognized role: " + role);
                     }
 
                     if (userDetails != null) {
                         Authentication auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                                userDetails, null, userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(auth);
                         accessor.setUser(auth);
-                        System.out.println("✅ WebSocket user authenticated: " + userDetails.getUsername());
                     } else {
-                        System.out.println("❌ User not found in repository for email: " + email);
+                        throw new IllegalArgumentException("User not found for email: " + email);
                     }
                 } catch (Exception e) {
-                    System.out.println("🚨 JWT validation failed: " + e.getMessage());
                     throw new IllegalArgumentException("Invalid WebSocket JWT", e);
                 }
-            } else {
-                System.out.println("⚠️ No valid Authorization header found.");
             }
         }
 

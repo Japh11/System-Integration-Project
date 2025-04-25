@@ -1,14 +1,18 @@
 package com.Capstone.IskoLAIR.Security;
 
+import com.Capstone.IskoLAIR.Repository.AdminRepository;
+import com.Capstone.IskoLAIR.Repository.ScholarRepository;
+import com.Capstone.IskoLAIR.Repository.StaffRepository;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,12 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.Capstone.IskoLAIR.Repository.AdminRepository;
-import com.Capstone.IskoLAIR.Repository.ScholarRepository;
-import com.Capstone.IskoLAIR.Repository.StaffRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Configuration
@@ -36,16 +34,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔧 inject CORS config
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/ws/**").permitAll()
-            	    .requestMatchers("/api/auth/**").permitAll()
-            	    .requestMatchers("/api/contacts**").authenticated()
-            	    .requestMatchers("/uploads/**").permitAll()
-                    .requestMatchers("/api/fileresources/**").permitAll()
-            	    .requestMatchers("/api/scholar/reset-password", "/api/scholar/change-password", "/api/scholar/save-password").permitAll()
-            	    
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/contacts**").authenticated()
+                .requestMatchers("/api/fileresources/**").permitAll()
+                .requestMatchers("/api/scholar/reset-password", "/api/scholar/change-password", "/api/scholar/save-password").permitAll()
 
                 // Admin-Only Routes
                 .requestMatchers("/api/admin/register-staff").hasAuthority("ROLE_ADMIN")
@@ -54,26 +52,27 @@ public class SecurityConfig {
 
                 // Admin & Staff can register scholars
                 .requestMatchers("/api/admin/register-scholar").hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+
+                // Contact visibility
                 .requestMatchers("/api/staff/visible").hasAnyAuthority("ROLE_SCHOLAR", "ROLE_STAFF", "ROLE_ADMIN")
 
-                // Scholar Routes - Only SCHOLAR can access
+                // Scholar Routes
                 .requestMatchers("/api/scholar/**").hasAuthority("ROLE_SCHOLAR")
                 .requestMatchers(HttpMethod.PUT, "/api/scholars/{id}").hasAnyAuthority("ROLE_SCHOLAR", "ROLE_ADMIN", "ROLE_STAFF")
                 .requestMatchers("/api/scholars/info").hasAuthority("ROLE_SCHOLAR")
 
-                // Staff Routes - Only STAFF can access
+                // Staff Routes
                 .requestMatchers("/api/staff/{id}").hasAnyAuthority("ROLE_STAFF", "ROLE_ADMIN")
                 .requestMatchers("/api/staff/**").hasAuthority("ROLE_STAFF")
 
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> 
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Access Denied")
-                )
+                .authenticationEntryPoint((request, response, authException) ->
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Access Denied"))
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class); 
+            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -108,23 +107,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return new ProviderManager(List.of(
-            adminAuthenticationProvider(), 
-            scholarAuthenticationProvider(), 
-            staffAuthenticationProvider()  
+            adminAuthenticationProvider(),
+            scholarAuthenticationProvider(),
+            staffAuthenticationProvider()
         ));
     }
 
-//    @Bean
-//    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
-//        return new GrantedAuthorityDefaults(""); // Remove "ROLE_" prefix if necessary
-//    }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("✅ CORS config bean loaded — ready to serve");
-
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:5173",
@@ -136,7 +128,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", config); // Applies to all routes
         return source;
     }
 }

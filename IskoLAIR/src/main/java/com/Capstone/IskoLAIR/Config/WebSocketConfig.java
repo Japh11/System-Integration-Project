@@ -15,7 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import com.Capstone.IskoLAIR.Security.AuthChannelInterceptorAdapter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -32,7 +32,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Route messages to individual users based on their ID (scholarId or staffId)
         config.enableSimpleBroker("/user");
         config.setApplicationDestinationPrefixes("/app");
         config.setUserDestinationPrefix("/user");
@@ -42,7 +41,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
             .addEndpoint("/ws")
-            .setAllowedOrigins("http://localhost:5173")  // Adjust the origin as needed
+            .setAllowedOrigins(
+                "http://localhost:5173",
+                "https://system-integration-project.vercel.app"
+            )
             .withSockJS();
     }
 
