@@ -17,6 +17,7 @@
     "axios": "^1.8.3",
     "browser-image-compression": "^2.0.2",
     "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "iskolairfrontend": "file:",
     "lucide-react": "^0.488.0",
     "react": "^19.0.0",
