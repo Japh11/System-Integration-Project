@@ -22,6 +22,7 @@ const Assignment = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+  const FILE_URL = API_URL.replace("/api", "");
 
   useEffect(() => {
     async function loadAssignments() {
@@ -203,11 +204,11 @@ const Assignment = () => {
                     {selectedSubmission.filePath.split(",").map((file, idx) => (
                       <li key={idx}>
                         <a
-                          href={`${API_URL}/uploads/${file.trim().split("\\").pop()}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          download
-                        >
+                                href={`${FILE_URL}/uploads/${file.trim().split("\\").pop()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                              >
                           {file.trim().split("\\").pop()}
                         </a>
                       </li>

@@ -13,6 +13,9 @@ const ScholarAnnouncement = () => {
   const [lightboxImage, setLightboxImage] = useState(null);
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+  const FILE_URL = API_URL.replace("/api", "");
+
   const fetchAnnouncements = async () => {
     try {
       const data = await AnnouncementApi.getAllAnnouncements();
@@ -54,25 +57,20 @@ const ScholarAnnouncement = () => {
 
                   {announcement.photos && announcement.photos.length > 0 && (
                     <div className="announcement-photos">
-                      {announcement.photos.map((url, index) => (
-                        <img
-                          key={index}
-                          src={
-                            url.startsWith("data:") || url.startsWith("http")
-                              ? url
-                              : `data:image/jpeg;base64,${url}`
-                          }
-                          alt={`Photo ${index + 1}`}
-                          className="announcement-image"
-                          onClick={() =>
-                            setLightboxImage(
-                              url.startsWith("data:") || url.startsWith("http")
-                                ? url
-                                : `data:image/jpeg;base64,${url}`
-                            )
-                          }
-                        />
-                      ))}
+                      {announcement.photos.map((photo, index) => {
+                        const filename = photo.trim().split("\\").pop();
+                        const photoUrl = `${FILE_URL}/uploads/${filename}`;
+
+                        return (
+                          <img
+                            key={index}
+                            src={photoUrl}
+                            alt={`Photo ${index + 1}`}
+                            className="announcement-image"
+                            onClick={() => setLightboxImage(photoUrl)}
+                          />
+                        );
+                      })}
                       {lightboxImage && (
                         <div className="lightbox-overlay" onClick={() => setLightboxImage(null)}>
                           <img src={lightboxImage} alt="Enlarged" className="lightbox-image" />
@@ -83,10 +81,10 @@ const ScholarAnnouncement = () => {
 
                   <hr className="announcement-divider" />
 
-                  {/*<div className="announcement-actions">
+                  {/* <div className="announcement-actions">
                     <span className="icon">👍</span>
                     <span className="icon">💬</span>
-                  </div>*/}
+                  </div> */}
                 </li>
               ))}
             </ul>
