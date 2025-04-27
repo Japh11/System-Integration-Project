@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AssignmentApi from "../services/AssignmentApi";
 import { useNavigate, useParams } from "react-router-dom";
+import "../pages/css/AssignmentForm.css";
+import logo from "../assets/IskoLAIR_Logo.png"; 
 
 const AssignmentForm = () => {
     const [assignment, setAssignment] = useState({
@@ -57,37 +59,59 @@ const AssignmentForm = () => {
     };
 
     return (
-        <div>
-            <h3>{id ? "Edit Assignment" : "Create Assignment"}</h3>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="title"
-                    placeholder="Title"
-                    value={assignment.title}
-                    onChange={handleInputChange}
-                    required
-                />
-                <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={assignment.description}
-                    onChange={handleInputChange}
-                    required
-                />
-                <input
-                    type="date"
-                    name="dueDate"
-                    value={assignment.dueDate}
-                    onChange={handleInputChange}
-                    required
-                />
-                <button type="submit">{id ? "Update Assignment" : "Create Assignment"}</button>
-            </form>
+        <div className="assignment-creation-page">
+            <div className="staff-header">
+                <img src={logo} alt="IskoLAIR Logo" className="logo" />
+                    {/* Dummy Profile Icon */}
+                    <img
+                        src="https://via.placeholder.com/40"
+                        alt="Profile"
+                        style={{ width: "40px", height: "40px", cursor: "pointer" }}
+                        onClick={() => navigate("/staff/profile")} // Navigate to StaffProfile page
+                    />
+            </div>
+            <div className="assignment-form-wrapper">
+                <button className="back-bttn" onClick={() => navigate("/assignments")}>←</button>
+                <div className="assignment-form-container">
+                    <h1>{id ? "Edit Assignment" : "Create Assignment"}</h1>
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            Title
+                            <input
+                            type="text"
+                            name="title"
+                            value={assignment.title}
+                            onChange={handleInputChange}
+                            required
+                            />
+                        </div>
+                        <div className="input-group">
+                            <p>Description</p>
+                            <textarea
+                                name="description"
+                                value={assignment.description}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="input-group">
+                            Deadline
+                            <input
+                                type="date"
+                                name="dueDate"
+                                value={assignment.dueDate}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <button className="submit-button" type="submit">{id ? "Update Assignment" : "Create Assignment"}</button>
+                    </form>
 
-            {/* Error and Success Messages */}
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            {message && <p style={{ color: "green" }}>{message}</p>}
+                    {/* Error and Success Messages */}
+                    {error && <p className="error-message" style={{ color: "red" }}>{error}</p>}
+                    {message && <p className="success-message" style={{ color: "green" }}>{message}</p>}
+                </div>
+            </div>
         </div>
     );
 };
