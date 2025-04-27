@@ -3,6 +3,7 @@ package com.Capstone.IskoLAIR.Service;
 import com.Capstone.IskoLAIR.Entity.OurScholars;
 import com.Capstone.IskoLAIR.Repository.ScholarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,9 @@ import java.util.Optional;
 public class ScholarService {
     @Autowired
     private ScholarRepository scholarRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Assuming you have a PasswordEncoder bean
 
     public OurScholars uploadMonitoringSheet(Long scholarId, MultipartFile file) throws IOException {
         Optional<OurScholars> scholarOptional = scholarRepository.findById(scholarId);
@@ -57,16 +61,34 @@ public class ScholarService {
             scholar.setProvince(updatedScholar.getProvince());
             scholar.setDistrict(updatedScholar.getDistrict());
             scholar.setRegion(updatedScholar.getRegion());
-            scholar.setPassword(updatedScholar.getPassword());
+            if (updatedScholar.getPassword() != null && !updatedScholar.getPassword().isEmpty()) {
+                scholar.setPassword(passwordEncoder.encode(updatedScholar.getPassword()));
+            }
             return scholarRepository.save(scholar);
         }
         throw new RuntimeException("Scholar not found");
     }
 
-    // ✅ Delete scholar by ID
-    public void deleteScholar(Long id) {
-        if (scholarRepository.existsById(id)) {
-            scholarRepository.deleteById(id);
+    public void archiveScholar(Long id) {
+        Optional<OurScholars> scholarOpt = scholarRepository.findById(id);
+        if (scholarOpt.isPresent()) {
+            OurScholars scholar = scholarOpt.get();
+            scholar.setArchived(true);
+            scholarRepository.save(scholar);
+        } else {
+            throw new RuntimeException("Scholar not found");
+        }
+    }
+    
+    public void reactivateScholar(Long id) {
+        Optional<OurScholars> scholarOpt = scholarRepository.findById(id);
+        if (scholarOpt.isPresent()) {
+            OurScholars scholar = scholarOpt.get();
+            if (!scholar.isArchived()) {
+                throw new RuntimeException("Scholar is already active");
+            }
+            scholar.setArchived(false);
+            scholarRepository.save(scholar);
         } else {
             throw new RuntimeException("Scholar not found");
         }
@@ -75,6 +97,13 @@ public class ScholarService {
     public OurScholars findByEmail(String email) {
         return scholarRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Scholar not found with email: " + email));
+    }
+    public Optional<OurScholars> findById(Long id) {
+        return scholarRepository.findById(id);
+    }
+
+    public OurScholars save(OurScholars scholar) {
+        return scholarRepository.save(scholar);
     }
     
 }
