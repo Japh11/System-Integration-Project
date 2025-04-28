@@ -24,10 +24,6 @@ import ChatApi from "./services/ChatApi";
 import Chat from "./pages/Chat";
 import Resources from "./pages/Resources";
 import ScholarResources from "./pages/ScholarResources";
-import ScholarAnnouncement from "./pages/ScholarAnnouncement";
-import ScholarAssignment from "./pages/ScholarAssignment";
-import AboutUs from "./pages/AboutUs";
-import FAQ from "./pages/Faq";
 
 
 const App = () => {
@@ -50,10 +46,6 @@ const App = () => {
             <Route path="/scholar-creation" element={<ScholarCreation />} />
             <Route path="/scholar/profile" element={<ScholarProfile />} />
             <Route path="/scholar/resources" element={<ScholarResources />} />
-            <Route path="/scholar/announcements" element={<ScholarAnnouncement />} />
-            <Route path="/scholar/assignments" element={<ScholarAssignment />} />
-            <Route path="scholar/aboutus" element={<AboutUs />} />
-            <Route path="/FAQ" element={<FAQ />} />
 
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
