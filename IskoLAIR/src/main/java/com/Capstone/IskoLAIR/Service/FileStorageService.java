@@ -14,9 +14,7 @@ import java.util.UUID;
 public class FileStorageService {
 
     private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
-    private final String uploadDir = "uploads"; // Directory to save files
-    private final String baseUrl = "http://localhost:8080"; // Base URL for accessing files
- 
+
     public FileStorageService() {
         try {
             Files.createDirectories(this.fileStorageLocation);
@@ -30,7 +28,7 @@ public class FileStorageService {
         try {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return baseUrl + "/" + uploadDir + "/" + fileName; // Return the full URL
+            return fileName; // ✅ Only return the filename, not full URL
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
         }
