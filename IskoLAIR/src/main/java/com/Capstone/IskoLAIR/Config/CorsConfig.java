@@ -16,7 +16,7 @@
 //                registry.addMapping("/**")
 //                        .allowedOrigins(
 //                            "http://localhost:5173", 
-//                            "https://system-integration-project.vercel.app"
+//                            "https://iskolair-web-application.vercel.app"
 //                        )
 //                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 //                        .allowedHeaders("*")
