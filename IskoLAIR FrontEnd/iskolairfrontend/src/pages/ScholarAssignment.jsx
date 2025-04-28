@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ScholarHeader from "../components/ScholarHeader";
 import ScholarNavbar from "../components/ScholarNavbar";
-import { getSubmissionsByScholar, undoSubmission } from "../services/SubmissionApi";
 import AssignmentApi from "../services/AssignmentApi";
 import { getSubmissionsByScholar, undoSubmission } from "../services/SubmissionApi";
 import axios from "axios";
