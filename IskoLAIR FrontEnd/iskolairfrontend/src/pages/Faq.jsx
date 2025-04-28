@@ -1,6 +1,6 @@
 // src/FAQ.jsx
 import React, { useState } from "react";
-import "./css/FAQ.css"; // adjust path as needed
+import "./css/Faq.css"; // adjust path as needed
 
 const faqData = [
   {
