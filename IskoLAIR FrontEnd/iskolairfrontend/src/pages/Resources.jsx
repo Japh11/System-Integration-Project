@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import logo from "../assets/IskoLAIR_Logo.png";
 import ResourcesApi from "../services/ResourcesApi";
 import ResourcesForm from '../components/ResourcesForm';
@@ -15,14 +15,10 @@ const Resources = () => {
   const [editId, setEditId] = useState(null);
   const [activeDropdownId, setActiveDropdownId] = useState(null);
   const navigate = useNavigate();
-  const location = useLocation(); // Added useLocation()
-
-  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
-  const FILE_URL = API_URL.replace("/api", ""); // remove /api for file loading
 
   const load = () => {
     ResourcesApi.getAllResources()
-      .then(r => setResources(r))
+       .then(r => setResources(r)) // <- this is the fix
       .catch(() => setError("Failed to load resources"));
   };
 
@@ -42,36 +38,36 @@ const Resources = () => {
   return (
     <div className="resources-page">
       <div className="staff-header">
-        <img src={logo} alt="Logo" className="logo" />
+        <img src={logo} alt="Logo" className="logo"/>
         <img src={profileImg} alt="Profile" className="profile-icon"
-             onClick={() => navigate("/staff/profile")} />
+             onClick={()=>navigate("/staff/profile")}/>
       </div>
 
       <div className="resources-container">
-        <div className="Navigationbar">
-          <button
-            className={location.pathname === "/staff/dashboard" ? "active" : ""}
-            onClick={() => navigate("/staff/dashboard")}
+      <div className="Navigationbar">
+        <button
+          className={location.pathname === "/staff/dashboard" ? "active" : ""}
+          onClick={() => navigate("/staff/dashboard")}
           >
             Home
           </button>
           <button
             className={location.pathname === "/announcements" ? "active" : ""}
             onClick={() => navigate("/announcements")}
-          >
-            Announcements
+            >
+              Announcements
           </button>
           <button
             className={location.pathname === "/assignments" ? "active" : ""}
             onClick={() => navigate("/assignments")}
-          >
-            Assignments
+            >
+              Assigments
           </button>
           <button
             className={location.pathname === "/messages" ? "active" : ""}
             onClick={() => navigate("/messages")}
-          >
-            Messages
+            >
+              Messages
           </button>
           <button
             className={location.pathname === "/resources" ? "active" : ""}
@@ -79,13 +75,19 @@ const Resources = () => {
           >
             Resources
           </button>
-        </div>
+          {/*<button
+            className={location.pathname === "/faq" ? "active" : ""}
+            onClick={() => navigate("/faq")}
+            >
+              FAQ
+          </button> */}
+      </div>
 
         <div className="resources-content">
           <ResourcesForm
-            key={editId || 'new'}
+            key={editId||'new'}
             id={editId}
-            onCancel={() => setEditId(null)}
+            onCancel={()=>setEditId(null)}
             onSaved={handleSaved}
           />
 
@@ -93,53 +95,47 @@ const Resources = () => {
 
           <div className="resources-scrollable">
             <ul>
-              {resources.map(r => {
-                const filename = r.fileUrl.trim().split("\\").pop();
-                const resourceUrl = `${FILE_URL}/uploads/${filename}`;
-
-                return (
-                  <li key={r.id} className="resources-page-box">
-                    <div className="resources-header">
-                      <img src={profileImg} alt="" className="resources-profile" />
-                      <div className="resources-header-text">
-                        <h3 className="resources-author">IskoLAIR</h3>
-                      </div>
-                      <div className="resources-more">
-                        <button className="more-button"
-                          onClick={() => setActiveDropdownId(prev => prev === r.id ? null : r.id)}
-                        >
-                          <MoreVertIcon sx={{ color: '#334f7d' }} />
-                        </button>
-                        {activeDropdownId === r.id && (
-                          <div className="dropdown-menu">
-                            <button className="dropdown-item"
-                              onClick={() => { setEditId(r.id); setError(""); }}
-                            >
-                              Edit
-                            </button>
-                            <button className="dropdown-item delete-item"
-                              onClick={() => handleDelete(r.id)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
+              {resources.map(r=>(
+                <li key={r.id} className="resources-page-box">
+                  <div className="resources-header">
+                    <img src={profileImg} alt="" className="resources-profile"/>
+                    <div className="resources-header-text">
+                      <h3 className="resources-author">IskoLAIR</h3>
                     </div>
-                    <div className="resources-text">
-                      <h2 className="resource-title">{r.title}</h2>
+                    <div className="resources-more">
+                      <button className="more-button"
+                        onClick={()=>setActiveDropdownId(
+                          prev=> prev===r.id?null:r.id
+                        )}>
+                        <MoreVertIcon sx={{color:'#334f7d'}}/>
+                      </button>
+                      {activeDropdownId===r.id && (
+                        <div className="dropdown-menu">
+                          <button className="dropdown-item"
+                            onClick={()=>{ setEditId(r.id); setError(""); }}>
+                            Edit
+                          </button>
+                          <button className="dropdown-item delete-item"
+                            onClick={()=>handleDelete(r.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <div className="resources-file">
-                      {r.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i)
-                        ? <img src={resourceUrl} alt={r.title} className="resource-image" />
-                        : <a href={resourceUrl} target="_blank" rel="noopener noreferrer">
-                            <GetAppIcon /> Download
-                          </a>
-                      }
-                    </div>
-                  </li>
-                );
-              })}
+                  </div>
+                  <div className="resources-text">
+                    <h2 className="resource-title">{r.title}</h2>
+                  </div>
+                  <div className="resources-file">
+                    {r.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i)
+                      ? <img src={r.fileUrl} alt={r.title} className="resource-image"/>
+                      : <a href={r.fileUrl} target="_blank" rel="noopener noreferrer">
+                          <GetAppIcon/> Download
+                        </a>
+                    }
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

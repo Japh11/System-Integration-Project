@@ -19,9 +19,6 @@ const ScholarDashboard = () => {
   const [submissions, setSubmissions] = useState([]);
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
-  const FILE_URL = API_URL.replace("/api", "");
-
   useEffect(() => {
     const fetchScholarData = async () => {
       try {
@@ -34,9 +31,6 @@ const ScholarDashboard = () => {
 
         const submissionData = await getSubmissionsByScholar(scholarData.id);
         setSubmissions(submissionData);
-
-        const announcementData = await AnnouncementApi.getAllAnnouncements();
-        setAnnouncements(announcementData);
       } catch (err) {
         setError("Failed to fetch data. Please log in again.");
         console.error(err);
@@ -149,7 +143,7 @@ const ScholarDashboard = () => {
               <div className="scrollable-content">
                 {announcements.length > 0 ? (
                   <ul>
-                    {announcements.map((a) => (
+                    {announcements.map(a => (
                       <li key={a.id}>
                         <h4>{a.title}</h4>
                         <p>{a.description}</p>
@@ -157,20 +151,15 @@ const ScholarDashboard = () => {
                           <div>
                             <h5>Photos:</h5>
                             <ul>
-                              {a.photos.map((photo, i) => {
-                                const filename = photo.trim().split("\\").pop();
-                                const photoUrl = `${FILE_URL}/uploads/${filename}`;
-
-                                return (
-                                  <li key={i}>
-                                    <img
-                                      src={photoUrl}
-                                      alt={`Photo ${i + 1}`}
-                                      style={{ width: 100, marginRight: 10 }}
-                                    />
-                                  </li>
-                                );
-                              })}
+                              {a.photos.map((url, i) => (
+                                <li key={i}>
+                                  <img
+                                    src={url}
+                                    alt={`Photo ${i + 1}`}
+                                    style={{ width: 100, marginRight: 10 }}
+                                  />
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}

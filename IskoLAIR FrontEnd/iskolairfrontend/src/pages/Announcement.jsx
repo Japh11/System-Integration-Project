@@ -20,10 +20,6 @@ const Announcement = () => {
   const [editId, setEditId] = useState(null); // Store the id of the announcement to edit
   const navigate = useNavigate();
   const [lightboxImage, setLightboxImage] = useState(null);
-  const [activeDropdownId, setActiveDropdownId] = useState(null);
-
-  const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL; 
-  const FILE_URL = API_URL.replace("/api", "");
 
   const fetchAnnouncements = async () => {
     try {
@@ -47,17 +43,19 @@ const Announcement = () => {
     }
   };
 
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
+
   return (
     <div className="announcement-page">
       <StaffHeader />
-      <div className="staff-dashboard">
-        <StaffNavbar />
+        <div className="staff-dashboard">
+          <StaffNavbar />
 
         <div className="announcement-content">
           <div className="CreateAnnouncement-A" onClick={() => { setEditId(null); setShowModal(true); }}>
             <div className="create-post-container">
               <img src={profileImg} alt="Profile" className="create-post-profile" />
-              <div className="create-post-textbox">Create Announcement</div>
+            <div className="create-post-textbox">Create Announcement</div>
             </div>
           </div>
 
@@ -67,81 +65,83 @@ const Announcement = () => {
             <ul>
               {announcements.map((announcement) => (
                 <li key={announcement.id} className="announcement-page-box">
-                  <div className="announcement-header">
-                    <img src={profileImg} alt="Profile" className="announcement-profile" />
-                    <div className="announcement-header-text">
-                      <h3 className="announcement-author">IskoLAIR</h3>
-                      <p className="announcement-date">{new Date(announcement.createdDate).toLocaleString()}</p>
-                    </div>
-                    <div className="announcement-more">
-                      <button
-                        className="more-button"
-                        onClick={() =>
-                          setActiveDropdownId((prevId) =>
-                            prevId === announcement.id ? null : announcement.id
-                          )
-                        }
-                      >
-                        <MoreVertIcon sx={{ color: '#334f7d' }} />
-                      </button>
-
-                      {activeDropdownId === announcement.id && (
-                        <div className="dropdown-menu">
-                          <button
-                            className="dropdown-item"
-                            onClick={() => {
-                              setEditId(announcement.id);
-                              setShowModal(true);
-                              setActiveDropdownId(null);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="dropdown-item delete-item"
-                            onClick={() => {
-                              handleDeleteAnnouncement(announcement.id);
-                              setActiveDropdownId(null);
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                <div className="announcement-header">
+                  <img src={profileImg} alt="Profile" className="announcement-profile" />
+                  <div className="announcement-header-text">
+                    <h3 className="announcement-author">IskoLAIR</h3>
+                    <p className="announcement-date">{new Date(announcement.createdDate).toLocaleString()}</p>
                   </div>
+                  <div className="announcement-more">
+                    <button
+                      className="more-button"
+                      onClick={() =>
+                        setActiveDropdownId((prevId) =>
+                          prevId === announcement.id ? null : announcement.id
+                        )
+                      }
+                    >
+                      <MoreVertIcon sx={{ color: '#334f7d' }} />
+                    </button>
 
-                  <div className="announcement-text">
-                    <h2 className="announcement-title">{announcement.title}</h2>
-                    <p>{announcement.description}</p>
+                    {activeDropdownId === announcement.id && (
+                      <div className="dropdown-menu">
+                        <button
+                          className="dropdown-item"
+                          onClick={() => {
+                            setEditId(announcement.id);
+                            setShowModal(true);
+                            setActiveDropdownId(null);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="dropdown-item delete-item"
+                          onClick={() => {
+                            handleDeleteAnnouncement(announcement.id);
+                            setActiveDropdownId(null);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
-
-                  {announcement.photos && announcement.photos.length > 0 && (
-                    <div className="announcement-photos">
-                      {announcement.photos.map((photo, index) => {
-                        const filename = photo.trim().split("\\").pop(); // extract filename
-                        const photoUrl = `${FILE_URL}/uploads/${filename}`;
-
-                        return (
-                          <img
-                            key={index}
-                            src={photoUrl}
-                            alt={`Photo ${index + 1}`}
-                            className="announcement-image"
-                            onClick={() => setLightboxImage(photoUrl)}
-                          />
-                        );
-                      })}
-                      {lightboxImage && (
-                        <div className="lightbox-overlay" onClick={() => setLightboxImage(null)}>
-                          <img src={lightboxImage} alt="Enlarged" className="lightbox-image" />
-                        </div>
-                      )}
+                </div>
+              
+                <div className="announcement-text">
+                  <h2 className="announcement-title">{announcement.title}</h2>
+                  <p>{announcement.description}</p>
+                </div>
+              
+                {announcement.photos && announcement.photos.length > 0 && (
+                  <div className="announcement-photos">
+                  {announcement.photos.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url.startsWith("data:") || url.startsWith("http") ? url : `data:image/jpeg;base64,${url}`}
+                      alt={`Photo ${index + 1}`}
+                      className="announcement-image"
+                      onClick={() => setLightboxImage(url.startsWith("data:") || url.startsWith("http") ? url : `data:image/jpeg;base64,${url}`)}
+                    />
+                  ))}
+                  {lightboxImage && (
+                    <div className="lightbox-overlay" onClick={() => setLightboxImage(null)}>
+                      <img src={lightboxImage} alt="Enlarged" className="lightbox-image" />
                     </div>
                   )}
+                </div>
+                )}
+              
+                <hr className="announcement-divider" />
+              
+                {/*<div className="announcement-actions">
+                  <ThumbUpIcon className="icon" sx={{ color: '#334f7d' }} />
+                  <ChatBubbleOutlineIcon className="icon" sx={{ color: '#334f7d' }} />
 
-                  <hr className="announcement-divider" />
-                </li>
+                </div>*/}
+              </li>
+              
               ))}
             </ul>
           </div>
@@ -149,15 +149,15 @@ const Announcement = () => {
       </div>
 
       {showModal && (
-        <AnnouncementFormModal
-          onClose={() => setShowModal(false)}
-          onSuccess={() => {
-            setShowModal(false);
-            fetchAnnouncements(); // 🔄 refresh announcements
-          }}
-          id={editId}
-        />
-      )}
+      <AnnouncementFormModal
+        onClose={() => setShowModal(false)}
+        onSuccess={() => {
+          setShowModal(false);
+          fetchAnnouncements(); // 🔄 refresh announcements
+        }}
+        id={editId}
+      />
+    )}
     </div>
   );
 };
