@@ -36,8 +36,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔧 inject CORS config
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔧 CORS config
             .authorizeHttpRequests(auth -> auth
+                // Public Routes
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
@@ -65,10 +66,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/staff/{id}").hasAnyAuthority("ROLE_STAFF", "ROLE_ADMIN")
                 .requestMatchers("/api/staff/**").hasAuthority("ROLE_STAFF")
 
+                // Catch-all
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) ->
+                .authenticationEntryPoint((request, response, authException) -> 
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Access Denied"))
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
