@@ -2,19 +2,14 @@ package com.Capstone.IskoLAIR.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "scholars") // Table for Scholar users
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class OurScholars  {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +37,10 @@ public class OurScholars  {
     private String province;
     private String district;
     private String region;
+    @Column(nullable = false)
+    private boolean archived = false;
+    @Column(nullable = true)
+    private String profilePicture;
 
     @ManyToOne
     @JoinColumn(name = "created_by_admin_id")
@@ -283,10 +282,23 @@ public class OurScholars  {
     public void setAnnouncements(List<Announcement> announcements) {
         this.announcements = announcements;
     }
-@PreRemove
-  private void detatchAnnouncements() {
-    for (Announcement ann : new ArrayList<>(announcements)) {
-      ann.getScholars().remove(this);
+    @PreRemove
+    private void detatchAnnouncements() {
+        for (Announcement ann : new ArrayList<>(announcements)) {
+        ann.getScholars().remove(this);
+        }
     }
-  }
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
 }
