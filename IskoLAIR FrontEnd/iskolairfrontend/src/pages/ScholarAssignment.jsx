@@ -16,7 +16,9 @@ const ScholarAssignment = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
   const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
+  const FILE_URL = API_URL.replace("/api", ""); // ✅ Correct file serving base
 
   useEffect(() => {
     fetchScholarData();
@@ -141,24 +143,29 @@ const ScholarAssignment = () => {
                         <p><strong>Due:</strong> {a.dueDate}</p>
                         <p><strong>Status:</strong> {sub ? sub.status : "Not submitted"}</p>
                         {sub?.filePath && (
-                            <div>
-                              <p><strong>Files:</strong></p>
-                              <ul>
-                                {sub.filePath.split(",").map((file, idx) => (
+                          <div>
+                            <p><strong>Files:</strong></p>
+                            <ul>
+                              {sub.filePath.split(",").map((file, idx) => {
+                                const filename = file.trim().split("\\").pop();
+                                const fileUrl = `${FILE_URL}/uploads/${filename}`;
+
+                                return (
                                   <li key={idx}>
                                     <a
-                                      href={`${API_URL}/uploads/${file.trim().split("\\").pop()}`}
+                                      href={fileUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       download
                                     >
-                                      {file.trim().split("\\").pop()}
+                                      {filename}
                                     </a>
                                   </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                       {submitted ? (
                         sub.status !== "verified" && (
