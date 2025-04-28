@@ -35,6 +35,7 @@
   margin: 0;
   color: #334F7D;
 }
+
 .filter-buttons {
   display: flex;
   gap: 10px;
@@ -42,8 +43,8 @@
 }
 
 .filter-buttons button {
-  background-color: #334F7D; /* Darker background */
-  color: white; /* White text */
+  background-color: #e0e4f1;
+  color: #334F7D;
   border: none;
   padding: 10px 20px;
   font-weight: 600;
@@ -52,13 +53,9 @@
   transition: 0.2s ease;
 }
 
-.filter-buttons button:hover {
-  background-color: #25335A; /* Darker blue on hover */
-}
-
 .filter-buttons button.active {
-  background: #25335A; /* Even darker when active */
-  color: #ffffff;
+  background: #334F7D;
+  color: white;
 }
 
 .submission-list {

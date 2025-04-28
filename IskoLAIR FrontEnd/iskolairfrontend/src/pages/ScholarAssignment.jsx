@@ -7,7 +7,7 @@ import AssignmentApi from "../services/AssignmentApi";
 import { getSubmissionsByScholar, undoSubmission } from "../services/SubmissionApi";
 import axios from "axios";
 import "../pages/css/ScholarDashboard.css";
-import "../pages/css/ScholarAssignment.css";
+import "../pages/css/Assignment.css";
 
 const ScholarAssignment = () => {
   const [assignments, setAssignments] = useState([]);
@@ -15,11 +15,10 @@ const ScholarAssignment = () => {
   const [selectedFiles, setSelectedFiles] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_ISKOLAIR_API_URL;
-  const FILE_URL = API_URL.replace("/api", ""); // remove /api for file loading
+  const FILE_URL = API_URL.replace("/api", ""); // ✅ Correct file serving base
 
   useEffect(() => {
     fetchScholarData();
@@ -116,30 +115,6 @@ const ScholarAssignment = () => {
     }
   };
 
-  const handleFilterChange = (status) => {
-    setFilter(status);
-  };
-
-  const filteredAssignments = assignments.filter((assignment) => {
-    const sub = getSubmission(assignment.id);
-    const dueDate = new Date(assignment.dueDate);
-    const now = new Date();
-
-    switch (filter) {
-      case "pending":
-        return !sub && dueDate >= now;
-      case "completed":
-        return sub && (sub.status === "verified" || sub.status === "unverified");
-      case "pastdue":
-        return !sub && dueDate < now;
-      default:
-        return true;
-    }
-  });
-
-  const verifiedSubmissions = submissions.filter(s => s.status === "verified");
-  const unverifiedSubmissions = submissions.filter(s => s.status === "unverified");
-
   return (
     <div className="assignment-page">
       <ScholarHeader />
@@ -150,20 +125,14 @@ const ScholarAssignment = () => {
           <div className="assignment-container">
             <div className="assignment-header">
               <h1>Assignments</h1>
-              <div className="filter-buttons">
-                <button onClick={() => handleFilterChange("all")}>All</button>
-                <button onClick={() => handleFilterChange("pending")}>Pending</button>
-                <button onClick={() => handleFilterChange("completed")}>Completed</button>
-                <button onClick={() => handleFilterChange("pastdue")}>Past Due</button>
-              </div>
             </div>
 
             {error && <p className="error-message">{error}</p>}
             {message && <p className="success-message">{message}</p>}
 
-            {filteredAssignments.length > 0 ? (
+            {assignments.length > 0 ? (
               <ul className="submission-list">
-                {filteredAssignments.map((a) => {
+                {assignments.map((a) => {
                   const sub = getSubmission(a.id);
                   const submitted = hasSubmitted(a.id);
 
@@ -177,18 +146,23 @@ const ScholarAssignment = () => {
                           <div>
                             <p><strong>Files:</strong></p>
                             <ul>
-                              {sub.filePath.split(",").map((file, idx) => (
-                                <li key={idx}>
-                                  <a
-                                    href={`${FILE_URL}/uploads/${file.trim().split("\\").pop()}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    download
-                                  >
-                                    {file.trim().split("\\").pop()}
-                                  </a>
-                                </li>
-                              ))}
+                              {sub.filePath.split(",").map((file, idx) => {
+                                const filename = file.trim().split("\\").pop();
+                                const fileUrl = `${FILE_URL}/uploads/${filename}`;
+
+                                return (
+                                  <li key={idx}>
+                                    <a
+                                      href={fileUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download
+                                    >
+                                      {filename}
+                                    </a>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </div>
                         )}
