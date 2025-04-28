@@ -42,7 +42,14 @@ public class StaffService {
             staff.setPassword(passwordEncoder.encode(updatedStaff.getPassword()));
         }
         return staffRepository.save(staff);
-    }    
+    }
+    public void deleteStaff(Long id) {
+        if (!staffRepository.existsById(id)) {
+            throw new RuntimeException("Staff not found");
+        }
+        staffRepository.deleteById(id);
+    }
+    
     public Staff getStaffById(Long id) {
         Optional<Staff> staff = staffRepository.findById(id);
         return staff.orElse(null);  // Return null if no staff found
