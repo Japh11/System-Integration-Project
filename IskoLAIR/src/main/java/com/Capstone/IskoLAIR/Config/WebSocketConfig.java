@@ -43,7 +43,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             .addEndpoint("/ws")
             .setAllowedOrigins(
                 "http://localhost:5173",
-                "https://system-integration-project.vercel.app"
+                "https://iskolair-web-application.vercel.app"
             )
             .withSockJS();
     }
